@@ -16,12 +16,13 @@
         }
 
         body, html {
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
             background-color: #030008;
             font-family: 'Montserrat', sans-serif;
             color: #fff;
+            position: fixed;
         }
 
         /* Landscape Enforcement Overlay */
@@ -62,11 +63,12 @@
             }
         }
 
-        /* Full Screen Container */
+        /* Full Screen Absolute Container */
         .sunwin-container {
+            position: absolute;
+            inset: 0;
             width: 100vw;
             height: 100vh;
-            position: relative;
             background: radial-gradient(circle at center, #1f0a3a 0%, #0a0314 60%, #030008 100%);
             display: flex;
             flex-direction: column;
@@ -77,8 +79,8 @@
         /* Top Header Bar */
         .top-bar {
             width: 100%;
-            height: 60px;
-            padding: 0 20px;
+            height: 55px;
+            padding: 0 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -90,17 +92,17 @@
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             background: linear-gradient(90deg, rgba(20, 10, 40, 0.9) 0%, rgba(40, 20, 70, 0.7) 100%);
-            padding: 4px 16px 4px 6px;
+            padding: 3px 14px 3px 5px;
             border-radius: 30px;
             border: 1px solid rgba(255, 215, 0, 0.4);
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
         .avatar-box {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: radial-gradient(circle, #ffea9f 0%, #b8860b 100%);
             border: 2px solid #fff;
@@ -109,7 +111,7 @@
             align-items: center;
             font-weight: 900;
             color: #4a0000;
-            font-size: 16px;
+            font-size: 15px;
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
         }
 
@@ -119,14 +121,14 @@
         }
 
         .user-name {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
             color: #e0d0ff;
             text-transform: uppercase;
         }
 
         .user-balance {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 900;
             color: #ffd700;
             text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
@@ -136,9 +138,9 @@
         .session-info {
             background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(255, 215, 0, 0.3);
-            padding: 6px 16px;
+            padding: 5px 14px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: #ff9d00;
             letter-spacing: 1px;
@@ -146,12 +148,12 @@
 
         .top-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .icon-btn {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: linear-gradient(180deg, #3a1c5c 0%, #1a0b2e 100%);
             border: 1px solid #ffd700;
@@ -170,16 +172,16 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 0 30px;
+            padding: 0 20px;
             position: relative;
             z-index: 5;
         }
 
         .bet-door {
-            width: 22vw;
-            max-width: 230px;
-            height: 22vw;
-            max-height: 230px;
+            width: 20vw;
+            max-width: 210px;
+            height: 20vw;
+            max-height: 210px;
             border-radius: 50%;
             position: relative;
             cursor: pointer;
@@ -224,8 +226,8 @@
         }
 
         .door-title {
-            font-size: 4.5vw;
-            max-font-size: 48px;
+            font-size: 4vw;
+            max-font-size: 44px;
             font-weight: 900;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -235,17 +237,17 @@
         .door-tai .door-title { color: #ff3344; text-shadow: 0 0 15px rgba(230, 57, 70, 0.9); }
 
         .door-sub {
-            font-size: 1.3vw;
+            font-size: 1.2vw;
             font-weight: 800;
             color: #ffd700;
-            margin-top: 4px;
+            margin-top: 3px;
         }
 
         .door-stats {
-            margin-top: 8px;
+            margin-top: 6px;
             background: rgba(0,0,0,0.6);
-            padding: 4px 12px;
-            border-radius: 12px;
+            padding: 3px 10px;
+            border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.1);
             display: flex;
             flex-direction: column;
@@ -253,13 +255,13 @@
         }
 
         .bet-user-amount {
-            font-size: 1.3vw;
+            font-size: 1.2vw;
             font-weight: 900;
             color: #00ffcc;
             font-family: 'Roboto Mono', monospace;
         }
         .bet-total-amount {
-            font-size: 0.9vw;
+            font-size: 0.8vw;
             color: #aaa;
             font-weight: 600;
         }
@@ -267,16 +269,16 @@
         /* Center Stage */
         .center-stage {
             position: relative;
-            width: 280px;
-            height: 280px;
+            width: 250px;
+            height: 250px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .plate {
-            width: 270px;
-            height: 270px;
+            width: 240px;
+            height: 240px;
             border-radius: 50%;
             background: radial-gradient(circle, #8a1414 0%, #400505 60%, #1a0000 100%);
             border: 10px solid #e6b800;
@@ -288,8 +290,8 @@
         }
 
         .plate-inner {
-            width: 215px;
-            height: 215px;
+            width: 190px;
+            height: 190px;
             border-radius: 50%;
             background: radial-gradient(circle, #a81919 0%, #570a0a 70%, #2e0202 100%);
             border: 2px dashed rgba(255, 215, 0, 0.4);
@@ -301,25 +303,25 @@
 
         .dice-container {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             z-index: 2;
         }
 
         .dice {
-            width: 46px;
-            height: 46px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(145deg, #ffffff 0%, #e6e6e6 100%);
             border-radius: 8px;
             box-shadow: inset 0 -3px 4px rgba(0,0,0,0.3), 0 6px 12px rgba(0,0,0,0.6);
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            padding: 5px;
+            padding: 4px;
         }
 
         .dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             background-color: #111;
             border-radius: 50%;
             justify-self: center;
@@ -328,8 +330,8 @@
         .dot.red { background-color: #d90429; }
 
         .bowl {
-            width: 250px;
-            height: 250px;
+            width: 220px;
+            height: 220px;
             border-radius: 50%;
             background: radial-gradient(circle at 35% 35%, #ffd700 0%, #b8860b 40%, #5c4300 80%, #241a00 100%);
             border: 5px solid #ffea9f;
@@ -346,8 +348,8 @@
         .bowl:active { cursor: grabbing; }
 
         .bowl-dragon-pattern {
-            width: 160px;
-            height: 160px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             border: 3px double rgba(255, 255, 255, 0.4);
             display: flex;
@@ -356,18 +358,18 @@
         }
 
         .bowl-handle {
-            width: 44px;
-            height: 44px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: radial-gradient(circle, #fff 0%, #ffd700 60%, #996515 100%);
             border: 2px solid #fff;
         }
 
         .bowl-text {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 800;
             color: #4a3000;
-            margin-top: 4px;
+            margin-top: 3px;
             text-transform: uppercase;
         }
 
@@ -385,12 +387,12 @@
 
         .timer-badge {
             position: absolute;
-            top: -22px;
+            top: -20px;
             z-index: 15;
             background: radial-gradient(circle, #2a0845 0%, #0e001a 100%);
             border: 3px solid #ffd700;
-            width: 68px;
-            height: 68px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -399,7 +401,7 @@
         }
 
         .timer-number {
-            font-size: 30px;
+            font-size: 26px;
             font-weight: 900;
             color: #ffd700;
             font-family: 'Roboto Mono', monospace;
@@ -410,15 +412,15 @@
 
         .btn-open-bowl {
             position: absolute;
-            bottom: -22px;
+            bottom: -20px;
             z-index: 15;
             background: linear-gradient(180deg, #ffea9f 0%, #d4af37 50%, #aa7c11 100%);
             border: 2px solid #fff;
-            padding: 6px 20px;
-            border-radius: 18px;
+            padding: 5px 18px;
+            border-radius: 16px;
             color: #3d2200;
             font-weight: 900;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             display: none;
             box-shadow: 0 6px 15px rgba(0,0,0,0.8);
@@ -427,27 +429,27 @@
         /* History Bar */
         .history-bar {
             position: absolute;
-            bottom: 115px;
+            bottom: 105px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(5, 2, 12, 0.9);
             border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 15px;
-            padding: 4px 12px;
+            border-radius: 14px;
+            padding: 3px 10px;
             display: flex;
-            gap: 6px;
+            gap: 5px;
             align-items: center;
             z-index: 10;
         }
 
         .history-dot {
-            width: 13px;
-            height: 13px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 7px;
+            font-size: 6px;
             font-weight: 900;
         }
         .history-dot.xiu { background: #2196f3; color: #fff; }
@@ -456,8 +458,8 @@
         /* Bottom Controls Bar */
         .bottom-bar {
             width: 100%;
-            height: 110px;
-            padding: 5px 20px 15px 20px;
+            height: 100px;
+            padding: 4px 15px 12px 15px;
             background: linear-gradient(0deg, rgba(10, 4, 20, 0.98) 0%, rgba(10, 4, 20, 0.7) 80%, transparent 100%);
             display: flex;
             flex-direction: column;
@@ -469,190 +471,22 @@
 
         .chips-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
             align-items: center;
         }
 
         .chip {
-            width: 50px;
-            height: 50px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 900;
             cursor: pointer;
             position: relative;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.7);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.7);
             border: 3px dashed rgba(255,255,255,0.7);
-            transition: transform 0.15s ease;
-        }
-        .chip:hover { transform: translateY(-4px); }
-        .chip.selected {
-            transform: translateY(-7px) scale(1.08);
-            box-shadow: 0 8px 18px rgba(0,0,0,0.9), 0 0 12px rgba(255,215,0,0.8);
-            border-color: #fff;
-        }
-
-        .chip-1k   { background: radial-gradient(circle, #5c6bc0 0%, #283593 100%); color: #fff; }
-        .chip-5k   { background: radial-gradient(circle, #26a69a 0%, #00695c 100%); color: #fff; }
-        .chip-10k  { background: radial-gradient(circle, #66bb6a 0%, #2e7d32 100%); color: #fff; }
-        .chip-50k  { background: radial-gradient(circle, #ffa726 0%, #ef6c00 100%); color: #fff; }
-        .chip-100k { background: radial-gradient(circle, #ab47bc 0%, #6a1b9a 100%); color: #fff; }
-        .chip-500k { background: radial-gradient(circle, #ec407a 0%, #ad1457 100%); color: #fff; }
-        .chip-1m   { background: radial-gradient(circle, #ffd700 0%, #b8860b 100%); color: #3d2200; }
-        .chip-all  { background: radial-gradient(circle, #e53935 0%, #8e0000 100%); color: #fff; font-size: 10px; }
-
-        .action-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .btn-action {
-            padding: 6px 20px;
-            border-radius: 16px;
-            font-weight: 800;
-            font-size: 12px;
-            cursor: pointer;
-            border: none;
-            text-transform: uppercase;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        .btn-clear { background: linear-gradient(180deg, #757575 0%, #424242 100%); color: #fff; border: 1px solid #aaa; }
-        .btn-confirm { background: linear-gradient(180deg, #2e7d32 0%, #1b5e20 100%); color: #fff; border: 1px solid #81c784; padding: 6px 30px; }
-        .btn-action:active { transform: scale(0.95); }
-
-        /* Result Win Banner */
-        .result-banner {
-            position: absolute;
-            top: 22%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            z-index: 30;
-            background: linear-gradient(180deg, rgba(20, 0, 0, 0.95) 0%, rgba(60, 0, 0, 0.95) 100%);
-            border: 3px solid #ffd700;
-            padding: 10px 35px;
-            border-radius: 35px;
-            text-align: center;
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none;
-        }
-        .result-banner.show { transform: translate(-50%, -50%) scale(1); }
-        .result-title { font-size: 26px; font-weight: 900; color: #ffd700; }
-        .result-detail { font-size: 14px; font-weight: 700; color: #fff; }
-
-        /* Toast Popup */
-        .toast {
-            position: absolute;
-            top: 75px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-20px);
-            background: rgba(0,0,0,0.85);
-            border: 1px solid #ffd700;
-            color: #ffd700;
-            padding: 6px 18px;
-            border-radius: 18px;
-            font-size: 12px;
-            font-weight: 700;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s ease;
-            z-index: 50;
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    </style>
-</head>
-<body>
-
-    <div id="rotate-overlay">
-        <svg viewBox="0 0 24 24">
-            <path d="M0 0h24v24H0z" fill="none"/>
-            <path d="M16.48 2.52c3.27 1.55 5.61 4.72 5.97 8.48h1.5c-.47-4.82-3.53-8.84-7.87-10.5l.4 1.83zm-14.1 3.19C.88 7.37.16 9.61.03 12h1.5c.12-1.97.74-3.8 1.76-5.36l-.91-1.02zM12 3C7.03 3 3 7.03 3 12s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"/>
-        </svg>
-        <h2>Xoay Ngang Màn Hình Để Chơi</h2>
-        <p style="font-size: 13px; margin-top: 8px; color: #aaa;">Trải nghiệm Tài Xỉu Sunwin toàn màn hình ở chế độ ngang</p>
-    </div>
-
-    <div class="sunwin-container">
-        
-        <div id="toast" class="toast">Đặt cược thành công!</div>
-
-        <div id="result-banner" class="result-banner">
-            <div id="result-title" class="result-title">XỈU 9</div>
-            <div id="result-detail" class="result-detail">(2 - 3 - 4)</div>
-        </div>
-
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="user-profile">
-                <div class="avatar-box">VIP</div>
-                <div class="user-info">
-                    <span class="user-name">SunPlayer88</span>
-                    <span id="user-balance" class="user-balance">10,000,000</span>
-                </div>
-            </div>
-
-            <div class="session-info">
-                PHIÊN: <span id="session-id">#184920</span>
-            </div>
-
-            <div class="top-actions">
-                <div class="icon-btn" id="btn-sound" title="Âm thanh">🔊</div>
-            </div>
-        </div>
-
-        <!-- Arena -->
-        <div class="arena">
-            <!-- Xỉu Door -->
-            <div class="bet-door door-xiu" id="door-xiu" onclick="selectBetDoor('XIU')">
-                <div class="door-title">XỈU</div>
-                <div class="door-sub">3 - 10</div>
-                <div class="door-stats">
-                    <span class="bet-user-amount" id="xiu-user-bet">0</span>
-                    <span class="bet-total-amount" id="xiu-total-bet">Toàn cửa: 124.5M</span>
-                </div>
-            </div>
-
-            <!-- Center Stage -->
-            <div class="center-stage">
-                <div class="timer-badge">
-                    <span id="timer" class="timer-number">30</span>
-                </div>
-
-                <div class="plate">
-                    <div class="plate-inner">
-                        <div class="dice-container" id="dice-container">
-                            <div class="dice" id="dice-1"></div>
-                            <div class="dice" id="dice-2"></div>
-                            <div class="dice" id="dice-3"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bowl" id="bowl">
-                    <div class="bowl-dragon-pattern">
-                        <div class="bowl-handle"></div>
-                    </div>
-                    <span class="bowl-text">Kéo Để Nặn</span>
-                </div>
-
-                <button class="btn-open-bowl" id="btn-open-bowl" onclick="quickOpenBowl()">MỞ BÁT</button>
-            </div>
-
-            <!-- Tài Door -->
-            <div class="bet-door door-tai" id="door-tai" onclick="selectBetDoor('TAI')">
-                <div class="door-title">TÀI</div>
-                <div class="door-sub">11 - 18</div>
-                <div class="door-stats">
-                    <span class="bet-user-amount" id="tai-user-bet">0</span>
-                    <span class="bet-total-amount" id="tai-total-bet">Toàn cửa: 158.2M</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- History Bar -->
-        <div class="history-
+            transition: transform 
