@@ -1,58 +1,1167 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101827">
-  <title>Tài Xỉu — Mini Game</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Tài Xỉu Sunwin Original</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,800&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #05020a;
+            font-family: 'Montserrat', sans-serif;
+            color: #fff;
+        }
+
+        #rotate-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(5, 2, 10, 0.98);
+            z-index: 99999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #ffd700;
+            padding: 20px;
+        }
+
+        #rotate-overlay svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            animation: rotateDevice 2s infinite ease-in-out;
+            fill: #ffd700;
+        }
+
+        @keyframes rotateDevice {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @media screen and (orientation: portrait) {
+            #rotate-overlay {
+                display: flex !important;
+            }
+        }
+
+        .game-wrapper {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #1a0836 0%, #080214 70%, #030008 100%);
+            position: relative;
+        }
+
+        .sunwin-container {
+            width: 100%;
+            max-width: 1280px;
+            height: 100%;
+            max-height: 720px;
+            aspect-ratio: 16/9;
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(82, 22, 140, 0.4) 0%, rgba(10, 3, 25, 0.9) 80%);
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.9), 0 0 50px rgba(184, 134, 11, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .sunwin-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255,215,0,0.05) 0%, transparent 15%, transparent 85%, rgba(255,215,0,0.05) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .top-bar {
+            height: 60px;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            background: linear-gradient(180deg, rgba(15, 6, 30, 0.9) 0%, rgba(15, 6, 30, 0) 100%);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(90deg, rgba(20, 10, 40, 0.8) 0%, rgba(40, 20, 70, 0.6) 100%);
+            padding: 4px 16px 4px 6px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .avatar-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffea9f 0%, #b8860b 100%);
+            border: 2px solid #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 900;
+            color: #4a0000;
+            font-size: 18px;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: #e0d0ff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-balance {
+            font-size: 16px;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0,0,0,0.8);
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .session-info {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #ff9d00;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #3a1c5c 0%, #1a0b2e 100%);
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.92);
+        }
+
+        .arena {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .bet-door {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .bet-door:hover {
+            transform: scale(1.03);
+        }
+
+        .bet-door:active {
+            transform: scale(0.97);
+        }
+
+        .door-xiu {
+            background: radial-gradient(circle, #1a2a40 0%, #0a101d 70%, #03050a 100%);
+            border: 4px solid #3a75c4;
+            box-shadow: inset 0 0 30px rgba(58, 117, 196, 0.5), 0 0 25px rgba(58, 117, 196, 0.3);
+        }
+
+        .door-xiu.active {
+            border-color: #00f0ff;
+            box-shadow: inset 0 0 40px rgba(0, 240, 255, 0.8), 0 0 40px rgba(0, 240, 255, 0.8);
+            animation: pulseBlue 1s infinite alternate;
+        }
+
+        .door-tai {
+            background: radial-gradient(circle, #4a0d0d 0%, #200404 70%, #0a0101 100%);
+            border: 4px solid #e63946;
+            box-shadow: inset 0 0 30px rgba(230, 57, 70, 0.5), 0 0 25px rgba(230, 57, 70, 0.3);
+        }
+
+        .door-tai.active {
+            border-color: #ff003c;
+            box-shadow: inset 0 0 40px rgba(255, 0, 60, 0.8), 0 0 40px rgba(255, 0, 60, 0.8);
+            animation: pulseRed 1s infinite alternate;
+        }
+
+        @keyframes pulseBlue {
+            from { box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.6), 0 0 25px rgba(0, 240, 255, 0.6); }
+            to { box-shadow: inset 0 0 50px rgba(0, 240, 255, 1), 0 0 45px rgba(0, 240, 255, 1); }
+        }
+
+        @keyframes pulseRed {
+            from { box-shadow: inset 0 0 30px rgba(255, 0, 60, 0.6), 0 0 25px rgba(255, 0, 60, 0.6); }
+            to { box-shadow: inset 0 0 50px rgba(255, 0, 60, 1), 0 0 45px rgba(255, 0, 60, 1); }
+        }
+
+        .door-title {
+            font-size: 52px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .door-xiu .door-title {
+            color: #d8ecff;
+            text-shadow: 0 0 15px rgba(58, 117, 196, 0.9), 0 4px 8px rgba(0,0,0,0.9);
+        }
+
+        .door-tai .door-title {
+            color: #ff3344;
+            text-shadow: 0 0 15px rgba(230, 57, 70, 0.9), 0 4px 8px rgba(0,0,0,0.9);
+        }
+
+        .door-sub {
+            font-size: 15px;
+            font-weight: 800;
+            color: #ffd700;
+            margin-top: 4px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .door-stats {
+            margin-top: 10px;
+            background: rgba(0,0,0,0.6);
+            padding: 4px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bet-user-amount {
+            font-size: 15px;
+            font-weight: 900;
+            color: #00ffcc;
+            font-family: 'Roboto Mono', monospace;
+            text-shadow: 0 0 6px rgba(0,255,204,0.8);
+        }
+
+        .bet-total-amount {
+            font-size: 11px;
+            color: #aaa;
+            font-weight: 600;
+        }
+
+        .center-stage {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .plate {
+            width: 290px;
+            height: 290px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #8a1414 0%, #400505 60%, #1a0000 100%);
+            border: 12px solid #e6b800;
+            box-shadow: 0 0 0 4px #5c4700, 0 15px 35px rgba(0,0,0,0.9), inset 0 0 25px rgba(0,0,0,0.8);
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .plate-inner {
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #a81919 0%, #570a0a 70%, #2e0202 100%);
+            border: 2px dashed rgba(255, 215, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .dice-container {
+            display: flex;
+            gap: 12px;
+            z-index: 2;
+        }
+
+        .dice {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(145deg, #ffffff 0%, #e6e6e6 100%);
+            border-radius: 10px;
+            box-shadow: inset 0 -3px 4px rgba(0,0,0,0.3), 0 6px 12px rgba(0,0,0,0.6);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            padding: 6px;
+            position: relative;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            background-color: #111;
+            border-radius: 50%;
+            justify-self: center;
+            align-self: center;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .dot.red {
+            background-color: #d90429;
+            box-shadow: inset 0 1px 2px rgba(100,0,0,0.8);
+        }
+
+        .bowl {
+            width: 270px;
+            height: 270px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ffd700 0%, #b8860b 40%, #5c4300 80%, #241a00 100%);
+            border: 6px solid #ffea9f;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.8), inset 0 -10px 20px rgba(0,0,0,0.6);
+            position: absolute;
+            z-index: 10;
+            cursor: grab;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.05s ease-out;
+            touch-action: none;
+        }
+
+        .bowl:active {
+            cursor: grabbing;
+        }
+
+        .bowl-dragon-pattern {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 3px double rgba(255, 255, 255, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, transparent 70%);
+            position: relative;
+        }
+
+        .bowl-handle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 0%, #ffd700 60%, #996515 100%);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+            border: 2px solid #fff;
+        }
+
+        .bowl-text {
+            font-size: 11px;
+            font-weight: 800;
+            color: #4a3000;
+            margin-top: 6px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .shaking {
+            animation: shakeBowl 0.5s infinite ease-in-out;
+        }
+
+        @keyframes shakeBowl {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            20% { transform: translate(-8px, 6px) rotate(-4deg); }
+            40% { transform: translate(8px, -6px) rotate(4deg); }
+            60% { transform: translate(-6px, -4px) rotate(-2deg); }
+            80% { transform: translate(6px, 4px) rotate(2deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        .timer-badge {
+            position: absolute;
+            top: -20px;
+            z-index: 15;
+            background: radial-gradient(circle, #2a0845 0%, #0e001a 100%);
+            border: 3px solid #ffd700;
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.8), 0 0 15px rgba(255,215,0,0.5);
+        }
+
+        .timer-number {
+            font-size: 34px;
+            font-weight: 900;
+            color: #ffd700;
+            font-family: 'Roboto Mono', monospace;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+        }
+
+        .timer-number.warning {
+            color: #ff2233;
+            text-shadow: 0 0 12px rgba(255, 34, 51, 1);
+            animation: blink 0.5s infinite alternate;
+        }
+
+        @keyframes blink {
+            from { opacity: 1; }
+            to { opacity: 0.4; }
+        }
+
+        .btn-open-bowl {
+            position: absolute;
+            bottom: -25px;
+            z-index: 15;
+            background: linear-gradient(180deg, #ffea9f 0%, #d4af37 50%, #aa7c11 100%);
+            border: 2px solid #fff;
+            padding: 8px 24px;
+            border-radius: 20px;
+            color: #3d2200;
+            font-weight: 900;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.8), 0 0 10px rgba(255,215,0,0.5);
+            display: none;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-open-bowl:active {
+            transform: scale(0.95);
+        }
+
+        .bottom-bar {
+            height: 120px;
+            padding: 10px 20px 15px 20px;
+            background: linear-gradient(0deg, rgba(10, 4, 20, 0.95) 0%, rgba(10, 4, 20, 0.6) 80%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .chips-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chip {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.7);
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 4px dashed rgba(255,255,255,0.6);
+        }
+
+        .chip::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
+
+        .chip:hover {
+            transform: translateY(-5px);
+        }
+
+        .chip.selected {
+            transform: translateY(-8px) scale(1.08);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.9), 0 0 15px rgba(255,215,0,0.8);
+            border-color: #fff;
+        }
+
+        .chip-1k   { background: radial-gradient(circle, #5c6bc0 0%, #283593 100%); color: #fff; }
+        .chip-5k   { background: radial-gradient(circle, #26a69a 0%, #00695c 100%); color: #fff; }
+        .chip-10k  { background: radial-gradient(circle, #66bb6a 0%, #2e7d32 100%); color: #fff; }
+        .chip-50k  { background: radial-gradient(circle, #ffa726 0%, #ef6c00 100%); color: #fff; }
+        .chip-100k { background: radial-gradient(circle, #ab47bc 0%, #6a1b9a 100%); color: #fff; }
+        .chip-500k { background: radial-gradient(circle, #ec407a 0%, #ad1457 100%); color: #fff; }
+        .chip-1m   { background: radial-gradient(circle, #ffd700 0%, #b8860b 100%); color: #3d2200; }
+        .chip-all  { background: radial-gradient(circle, #e53935 0%, #8e0000 100%); color: #fff; font-size: 11px; }
+
+        .action-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-action {
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.2s ease;
+        }
+
+        .btn-clear {
+            background: linear-gradient(180deg, #757575 0%, #424242 100%);
+            color: #fff;
+            border: 1px solid #aaa;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(180deg, #2e7d32 0%, #1b5e20 100%);
+            color: #fff;
+            border: 1px solid #81c784;
+            padding: 8px 36px;
+            font-size: 14px;
+        }
+
+        .btn-action:active {
+            transform: scale(0.95);
+        }
+
+        .history-bar {
+            position: absolute;
+            bottom: 125px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(5, 2, 12, 0.85);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 4px 12px;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        }
+
+        .history-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 8px;
+            font-weight: 900;
+        }
+
+        .history-dot.xiu {
+            background: #2196f3;
+            color: #fff;
+            box-shadow: 0 0 6px rgba(33, 150, 243, 0.8);
+        }
+
+        .history-dot.tai {
+            background: #f44336;
+            color: #fff;
+            box-shadow: 0 0 6px rgba(244, 67, 54, 0.8);
+        }
+
+        .result-banner {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 30;
+            background: linear-gradient(180deg, rgba(20, 0, 0, 0.95) 0%, rgba(60, 0, 0, 0.95) 100%);
+            border: 3px solid #ffd700;
+            padding: 12px 40px;
+            border-radius: 40px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        .result-banner.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .result-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255,215,0,0.8);
+        }
+
+        .result-detail {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 2px;
+        }
+
+        .toast {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(0,0,0,0.85);
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
 </head>
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div class="brand"><span class="brand-icon">🎲</span><div><strong>TÀI XỈU</strong><small>MINI GAME • ĐIỂM ẢO</small></div></div>
-      <div class="balance"><span>Ví điểm thử</span><strong id="balance">100.000</strong></div>
-    </header>
 
-    <section class="hero">
-      <p class="eyebrow">THỬ VẬN MAY CỦA BẠN</p>
-      <h1>Đoán đúng — <span>Nhận điểm</span></h1>
-      <p class="subtitle">Mỗi phiên tự lắc sau 30 giây • Vốn ban đầu 100.000 điểm ảo • Không có tiền thật.</p>
-    </section>
+    <div id="rotate-overlay">
+        <svg viewBox="0 0 24 24">
+            <path d="M0 0h24v24H0z" fill="none"/>
+            <path d="M16.48 2.52c3.27 1.55 5.61 4.72 5.97 8.48h1.5c-.47-4.82-3.53-8.84-7.87-10.5l.4 1.83zm-14.1 3.19C.88 7.37.16 9.61.03 12h1.5c.12-1.97.74-3.8 1.76-5.36l-.91-1.02zM12 3C7.03 3 3 7.03 3 12s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"/>
+        </svg>
+        <h2>Xoay Ngang Màn Hình Để Chơi</h2>
+        <p style="font-size: 13px; margin-top: 8px; color: #aaa;">Trải nghiệm Tài Xỉu Sunwin tốt nhất ở chế độ màn hình ngang</p>
+    </div>
 
-    <section class="game-card">
-      <div class="round-row"><span>PHIÊN <b id="round">001</b></span><span id="status" class="status">ĐANG NHẬN CƯỢC</span></div>
-      <div class="timer-wrap"><div class="timer-label"><span>THỜI GIAN CÒN LẠI</span><strong id="countdown">30s</strong></div><div class="timer-track"><div id="timerBar" class="timer-bar"></div></div></div>
-      <div class="dice-area" aria-label="Ba viên xúc xắc">
-        <div class="die" id="die1">⚀</div><div class="die" id="die2">⚁</div><div class="die" id="die3">⚂</div>
-      </div>
-      <div class="result-box">
-        <span>TỔNG ĐIỂM</span><strong id="total">—</strong><b id="resultLabel">Chọn cửa để bắt đầu</b>
-      </div>
+    <div class="game-wrapper">
+        <div class="sunwin-container">
+            
+            <div id="toast" class="toast">Đặt cược thành công!</div>
 
-      <div class="bet-title"><span>1. Chọn cửa</span><small>Xỉu ≤ 10 • Tài ≥ 11</small></div>
-      <div class="choices">
-        <button class="choice tai" data-choice="tai" aria-pressed="false"><span>▲</span><strong>TÀI</strong><small>11 – 17 điểm</small></button>
-        <button class="choice xiu" data-choice="xiu" aria-pressed="false"><span>▼</span><strong>XỈU</strong><small>4 – 10 điểm</small></button>
-      </div>
+            <div id="result-banner" class="result-banner">
+                <div id="result-title" class="result-title">XỈU 9</div>
+                <div id="result-detail" class="result-detail">(2 - 3 - 4)</div>
+            </div>
 
-      <div class="bet-title"><span>2. Đặt điểm</span><small>Trả thưởng 1,98× tổng cược</small></div>
-      <div class="bet-control">
-        <button id="minus" class="stepper" aria-label="Giảm điểm cược">−</button>
-        <input id="bet" type="number" min="10" step="10" value="100" inputmode="numeric" aria-label="Số điểm cược">
-        <button id="plus" class="stepper" aria-label="Tăng điểm cược">+</button>
-      </div>
-      <div class="quick-bets"><button data-bet="50">50</button><button data-bet="100">100</button><button data-bet="250">250</button><button data-bet="500">500</button><button id="maxBet">TỐI ĐA</button></div>
-      <button id="roll" class="roll-button" disabled>CHỌN TÀI HOẶC XỈU</button>
-      <p class="hint" id="hint">Chọn cửa và số điểm cược, sau đó lắc xúc xắc.</p>
-    </section>
+            <div class="top-bar">
+                <div class="user-profile">
+                    <div class="avatar-box">VIP</div>
+                    <div class="user-info">
+                        <span class="user-name">SunPlayer88</span>
+                        <span id="user-balance" class="user-balance">10,000,000</span>
+                    </div>
+                </div>
 
-    <section class="history-card">
-      <div class="history-heading"><h2>Lịch sử phiên</h2><button id="reset" class="reset">Đặt lại điểm</button></div>
-      <div id="history" class="history-empty">Chưa có lượt chơi nào.</div>
-    </section>
-    <footer>Mini game giải trí • Điểm chỉ lưu trên trình duyệt này.</footer>
-  </main>
-  <script src="app.js"></script>
+                <div class="session-info">
+                    PHIÊN: <span id="session-id">#184920</span>
+                </div>
+
+                <div class="top-actions">
+                    <div class="icon-btn" id="btn-sound">🔊</div>
+                </div>
+            </div>
+
+            <div class="arena">
+                <div class="bet-door door-xiu" id="door-xiu" onclick="selectBetDoor('XIU')">
+                    <div class="door-title">XỈU</div>
+                    <div class="door-sub">3 - 10</div>
+                    <div class="door-stats">
+                        <span class="bet-user-amount" id="xiu-user-bet">0</span>
+                        <span class="bet-total-amount" id="xiu-total-bet">Toàn cửa: 124.5M</span>
+                    </div>
+                </div>
+
+                <div class="center-stage">
+                    <div class="timer-badge">
+                        <span id="timer" class="timer-number">30</span>
+                    </div>
+
+                    <div class="plate">
+                        <div class="plate-inner">
+                            <div class="dice-container" id="dice-container">
+                                <div class="dice" id="dice-1"></div>
+                                <div class="dice" id="dice-2"></div>
+                                <div class="dice" id="dice-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bowl" id="bowl">
+                        <div class="bowl-dragon-pattern">
+                            <div class="bowl-handle"></div>
+                        </div>
+                        <span class="bowl-text">Kéo Để Nặn</span>
+                    </div>
+
+                    <button class="btn-open-bowl" id="btn-open-bowl" onclick="quickOpenBowl()">MỞ BÁT</button>
+                </div>
+
+                <div class="bet-door door-tai" id="door-tai" onclick="selectBetDoor('TAI')">
+                    <div class="door-title">TÀI</div>
+                    <div class="door-sub">11 - 18</div>
+                    <div class="door-stats">
+                        <span class="bet-user-amount" id="tai-user-bet">0</span>
+                        <span class="bet-total-amount" id="tai-total-bet">Toàn cửa: 158.2M</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="history-bar" id="history-bar"></div>
+
+            <div class="bottom-bar">
+                <div class="chips-row">
+                    <div class="chip chip-1k" onclick="selectChip(1000)">1K</div>
+                    <div class="chip chip-5k" onclick="selectChip(5000)">5K</div>
+                    <div class="chip chip-10k selected" onclick="selectChip(10000)">10K</div>
+                    <div class="chip chip-50k" onclick="selectChip(50000)">50K</div>
+                    <div class="chip chip-100k" onclick="selectChip(100000)">100K</div>
+                    <div class="chip chip-500k" onclick="selectChip(500000)">500K</div>
+                    <div class="chip chip-1m" onclick="selectChip(1000000)">1M</div>
+                    <div class="chip chip-all" onclick="selectAllIn()">ALL IN</div>
+                </div>
+
+                <div class="action-row">
+                    <button class="btn-action btn-clear" onclick="clearCurrentBet()">HỦY CƯỢC</button>
+                    <button class="btn-action btn-confirm" onclick="confirmBet()">ĐẶT CƯỢC</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let balance = 10000000;
+        let selectedChipValue = 10000;
+        let currentSelectedDoor = null;
+        let pendingBets = { TAI: 0, XIU: 0 };
+        let confirmedBets = { TAI: 0, XIU: 0 };
+        let currentSession = 184920;
+        let timerSeconds = 30;
+        let gameState = 'BETTING';
+        let diceResults = [1, 2, 3];
+        let history = ['TAI', 'XIU', 'XIU', 'TAI', 'TAI', 'XIU', 'TAI', 'XIU', 'XIU', 'TAI', 'TAI', 'TAI'];
+        let soundEnabled = true;
+
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioCtx();
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'chip') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.08);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'tick') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(1000, now);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+                osc.start(now);
+                osc.stop(now + 0.04);
+            } else if (type === 'win') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'shake') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            }
+        }
+
+        document.getElementById('btn-sound').addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            document.getElementById('btn-sound').innerText = soundEnabled ? '🔊' : '🔇';
+        });
+
+        function formatMoney(amount) {
+            return amount.toLocaleString('vi-VN');
+        }
+
+        function updateUI() {
+            document.getElementById('user-balance').innerText = formatMoney(balance);
+            document.getElementById('session-id').innerText = '#' + currentSession;
+
+            const xiuTotal = confirmedBets.XIU + pendingBets.XIU;
+            const taiTotal = confirmedBets.TAI + pendingBets.TAI;
+
+            document.getElementById('xiu-user-bet').innerText = xiuTotal > 0 ? formatMoney(xiuTotal) : '0';
+            document.getElementById('tai-user-bet').innerText = taiTotal > 0 ? formatMoney(taiTotal) : '0';
+
+            renderHistory();
+        }
+
+        function renderDice(diceId, val) {
+            const diceElem = document.getElementById(diceId);
+            diceElem.innerHTML = '';
+
+            const dotPositions = {
+                1: [4],
+                2: [0, 8],
+                3: [0, 4, 8],
+                4: [0, 2, 6, 8],
+                5: [0, 2, 4, 6, 8],
+                6: [0, 2, 3, 5, 6, 8]
+            };
+
+            const activeDots = dotPositions[val] || [];
+
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                if (activeDots.includes(i)) {
+                    cell.className = 'dot' + (val === 1 ? ' red' : '');
+                }
+                diceElem.appendChild(cell);
+            }
+        }
+
+        function selectChip(val) {
+            playSound('chip');
+            selectedChipValue = val;
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+
+        function selectAllIn() {
+            playSound('chip');
+            selectedChipValue = balance;
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+
+        function selectBetDoor(door) {
+            if (gameState !== 'BETTING') return;
+            playSound('chip');
+
+            if (door === 'XIU' && confirmedBets.TAI > 0) {
+                showToast('Không thể đặt cả 2 cửa!');
+                return;
+            }
+            if (door === 'TAI' && confirmedBets.XIU > 0) {
+                showToast('Không thể đặt cả 2 cửa!');
+                return;
+            }
+
+            if (selectedChipValue > balance - (pendingBets.TAI + pendingBets.XIU)) {
+                showToast('Số dư không đủ!');
+                return;
+            }
+
+            currentSelectedDoor = door;
+            pendingBets[door] += selectedChipValue;
+
+            document.getElementById('door-xiu').classList.toggle('active', door === 'XIU');
+            document.getElementById('door-tai').classList.toggle('active', door === 'TAI');
+
+            updateUI();
+        }
+
+        function clearCurrentBet() {
+            if (gameState !== 'BETTING') return;
+            playSound('chip');
+            pendingBets.TAI = 0;
+            pendingBets.XIU = 0;
+            if (confirmedBets.TAI === 0 && confirmedBets.XIU === 0) {
+                document.getElementById('door-xiu').classList.remove('active');
+                document.getElementById('door-tai').classList.remove('active');
+            }
+            updateUI();
+        }
+
+        function confirmBet() {
+            if (gameState !== 'BETTING') return;
+            const totalPending = pendingBets.TAI + pendingBets.XIU;
+            if (totalPending <= 0) {
+                showToast('Vui lòng chọn số tiền cược!');
+                return;
+            }
+
+            balance -= totalPending;
+            confirmedBets.TAI += pendingBets.TAI;
+            confirmedBets.XIU += pendingBets.XIU;
+            pendingBets.TAI = 0;
+            pendingBets.XIU = 0;
+
+            playSound('win');
+            showToast('Đặt cược thành công!');
+            updateUI();
+        }
+
+        function renderHistory() {
+            const bar = document.getElementById('history-bar');
+            bar.innerHTML = '';
+            const recent = history.slice(-14);
+            recent.forEach(res => {
+                const dot = document.createElement('div');
+                dot.className = `history-dot ${res.toLowerCase()}`;
+                dot.innerText = res === 'TAI' ? 'T' : 'X';
+                bar.appendChild(dot);
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function startTimer() {
+            setInterval(() => {
+                if (gameState === 'BETTING') {
+                    timerSeconds--;
+                    const timerElem = document.getElementById('timer');
+                    timerElem.innerText = timerSeconds;
+
+                    if (timerSeconds <= 5 && timerSeconds > 0) {
+                        timerElem.classList.add('warning');
+                        playSound('tick');
+                    } else {
+                        timerElem.classList.remove('warning');
+                    }
+
+                    if (timerSeconds <= 0) {
+                        triggerShakeAndRevealPhase();
+                    }
+                }
+            }, 1000);
+        }
+
+        function triggerShakeAndRevealPhase() {
+            gameState = 'SHAKING';
+            
+            if (pendingBets.TAI > 0 || pendingBets.XIU > 0) {
+                confirmBet();
+            }
+
+            diceResults = [
+                Math.floor(Math.random() * 6) + 1,
+                Math.floor(Math.random() * 6) + 1,
+                Math.floor(Math.random() * 6) + 1
+            ];
+
+            renderDice('dice-1', diceResults[0]);
+            renderDice('dice-2', diceResults[1]);
+            renderDice('dice-3', diceResults[2]);
+
+            const bowl = document.getElementById('bowl');
+            bowl.style.transform = 'translate(0, 0)';
+            bowl.classList.add('shaking');
+            playSound('shake');
+
+            setTimeout(() => {
+                bowl.classList.remove('shaking');
+                gameState = 'REVEAL';
+                document.getElementById('timer').innerText = '0';
+                document.getElementById('btn-open-bowl').style.display = 'block';
+            }, 1500);
+        }
+
+        function quickOpenBowl() {
+            if (gameState !== 'REVEAL') return;
+            const bowl = document.getElementById('bowl');
+            bowl.style.transition = 'transform 0.5s ease-out';
+            bowl.style.transform = 'translate(200px, -200px)';
+            document.getElementById('btn-open-bowl').style.display = 'none';
+            processPayoutAndResult();
+        }
+
+        let isDragging = false;
+        let startX, startY;
+        const bowl = document.getElementById('bowl');
+
+        function onDragStart(e) {
+            if (gameState !== 'REVEAL') return;
+            isDragging = true;
+            const touch = e.touches ? e.touches[0] : e;
+            startX = touch.clientX;
+            startY = touch.clientY;
+            bowl.style.transition = 'none';
+        }
+
+        function onDragMove(e) {
+            if (!isDragging) return;
+            const touch = e.touches ? e.touches[0] : e;
+            const deltaX = touch.clientX - startX;
+            const deltaY = touch.clientY - startY;
+
+            bowl.style.transform = `translate(${deltaX}px,${deltaY}px)`;
+
+            const distance = Math.hypot(deltaX, deltaY);
+            if (distance > 100) {
+                isDragging = false;
+                quickOpenBowl();
+            }
+        }
+
+        function onDragEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            bowl.style.transition = 'transform 0.3s ease';
+            bowl.style.transform = 'translate(0, 0)';
+        }
+
+        bowl.addEventListener('mousedown', onDragStart);
+        window.addEventListener('mousemove', onDragMove);
+        window.addEventListener('mouseup', onDragEnd);
+
+        bowl.addEventListener('touchstart', onDragStart);
+        window.addEventListener('touchmove', onDragMove);
+        window.addEventListener('touchend', onDragEnd);
+
+        function processPayoutAndResult() {
+            const totalPoints = diceResults.reduce((a, b) => a + b, 0);
+            const winningDoor = totalPoints >= 11 ? 'TAI' : 'XIU';
+
+            history.push(winningDoor);
+
+            const userBetOnWin = confirmedBets[winningDoor];
+            if (userBetOnWin > 0) {
+                const winAmount = userBetOnWin * 2;
+                balance += winAmount;
+                playSound('win');
+            }
+
+            const banner = document.getElementById('result-banner');
+            const titleElem = document.getElementById('result-title');
+            const detailElem = document.getElementById('result-detail');
+
+            titleElem.innerText = `${winningDoor === 'TAI' ? 'TÀI' : 'XỈU'} ${totalPoints}`;
+            detailElem.innerText = `(${diceResults.join(' - ')})`;
+            banner.classList.add('show');
+
+            document.getElementById('door-xiu').classList.toggle('active', winningDoor === 'XIU');
+            document.getElementById('door-tai').classList.toggle('active', winningDoor === 'TAI');
+
+            updateUI();
+
+            setTimeout(() => {
+                banner.classList.remove('show');
+                resetNewSession();
+            }, 5000);
+        }
+
+        function resetNewSession() {
+            currentSession++;
+            timerSeconds = 30;
+            gameState = 'BETTING';
+            pendingBets = { TAI: 0, XIU: 0 };
+            confirmedBets = { TAI: 0, XIU: 0 };
+            currentSelectedDoor = null;
+
+            document.getElementById('door-xiu').classList.remove('active');
+            document.getElementById('door-tai').classList.remove('active');
+            document.getElementById('btn-open-bowl').style.display = 'none';
+
+            const bowl = document.getElementById('bowl');
+            bowl.style.transition = 'transform 0.5s ease';
+            bowl.style.transform = 'translate(0, 0)';
+
+            updateUI();
+        }
+
+        window.onload = () => {
+            renderDice('dice-1', 1);
+            renderDice('dice-2', 2);
+            renderDice('dice-3', 3);
+            updateUI();
+            startTimer();
+        };
+    </script>
 </body>
 </html>
