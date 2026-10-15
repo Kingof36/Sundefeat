@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>Tài Xỉu — Mini Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-icon">🎲</span><div><strong>TÀI XỈU</strong><small>MINI GAME • ĐIỂM ẢO</small></div></div>
+      <div class="balance"><span>Ví điểm thử</span><strong id="balance">100.000</strong></div>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">THỬ VẬN MAY CỦA BẠN</p>
+      <h1>Đoán đúng — <span>Nhận điểm</span></h1>
+      <p class="subtitle">Mỗi phiên tự lắc sau 30 giây • Vốn ban đầu 100.000 điểm ảo • Không có tiền thật.</p>
+    </section>
+
+    <section class="game-card">
+      <div class="round-row"><span>PHIÊN <b id="round">001</b></span><span id="status" class="status">ĐANG NHẬN CƯỢC</span></div>
+      <div class="timer-wrap"><div class="timer-label"><span>THỜI GIAN CÒN LẠI</span><strong id="countdown">30s</strong></div><div class="timer-track"><div id="timerBar" class="timer-bar"></div></div></div>
+      <div class="dice-area" aria-label="Ba viên xúc xắc">
+        <div class="die" id="die1">⚀</div><div class="die" id="die2">⚁</div><div class="die" id="die3">⚂</div>
+      </div>
+      <div class="result-box">
+        <span>TỔNG ĐIỂM</span><strong id="total">—</strong><b id="resultLabel">Chọn cửa để bắt đầu</b>
+      </div>
+
+      <div class="bet-title"><span>1. Chọn cửa</span><small>Xỉu ≤ 10 • Tài ≥ 11</small></div>
+      <div class="choices">
+        <button class="choice tai" data-choice="tai" aria-pressed="false"><span>▲</span><strong>TÀI</strong><small>11 – 17 điểm</small></button>
+        <button class="choice xiu" data-choice="xiu" aria-pressed="false"><span>▼</span><strong>XỈU</strong><small>4 – 10 điểm</small></button>
+      </div>
+
+      <div class="bet-title"><span>2. Đặt điểm</span><small>Trả thưởng 1,98× tổng cược</small></div>
+      <div class="bet-control">
+        <button id="minus" class="stepper" aria-label="Giảm điểm cược">−</button>
+        <input id="bet" type="number" min="10" step="10" value="100" inputmode="numeric" aria-label="Số điểm cược">
+        <button id="plus" class="stepper" aria-label="Tăng điểm cược">+</button>
+      </div>
+      <div class="quick-bets"><button data-bet="50">50</button><button data-bet="100">100</button><button data-bet="250">250</button><button data-bet="500">500</button><button id="maxBet">TỐI ĐA</button></div>
+      <button id="roll" class="roll-button" disabled>CHỌN TÀI HOẶC XỈU</button>
+      <p class="hint" id="hint">Chọn cửa và số điểm cược, sau đó lắc xúc xắc.</p>
+    </section>
+
+    <section class="history-card">
+      <div class="history-heading"><h2>Lịch sử phiên</h2><button id="reset" class="reset">Đặt lại điểm</button></div>
+      <div id="history" class="history-empty">Chưa có lượt chơi nào.</div>
+    </section>
+    <footer>Mini game giải trí • Điểm chỉ lưu trên trình duyệt này.</footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
