@@ -1,248 +1,242 @@
 document.addEventListener('DOMContentLoaded', () => {
-  let balance = parseInt(localStorage.getItem('tx_balance')) || 100000;
-  let currentRound = parseInt(localStorage.getItem('tx_round')) || 1;
-  let history = JSON.parse(localStorage.getItem('tx_history')) || [];
-  
-  let selectedChoice = null;
-  let timer = 30;
+  // Mặc định khởi đầu với số tiền 10.000.000 (10 triệu)
+  let balance = parseInt(localStorage.getItem('sun_balance')) || 10000000;
+  let currentRound = parseInt(localStorage.getItem('sun_round')) || 125;
+  let history = JSON.parse(localStorage.getItem('sun_history')) || [];
+
+  let selectedChip = 1000; // Mức phỉnh chọn mặc định 1K
+  let myBets = { tai: 0, xiu: 0 };
+  let timer = 40;
   let timerInterval = null;
-  let isRolling = false;
+  
+  // Trạng thái: 'betting' (đang cược), 'waiting_open' (chờ mở bát), 'result' (hiển thị kết quả)
+  let gameState = 'betting'; 
+  let finalDice = [1, 1, 1];
 
   const diceGlyphs = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
 
+  // DOM Elements
   const balanceEl = document.getElementById('balance');
   const roundEl = document.getElementById('round');
   const statusEl = document.getElementById('status');
   const countdownEl = document.getElementById('countdown');
-  const timerBarEl = document.getElementById('timerBar');
   const die1El = document.getElementById('die1');
   const die2El = document.getElementById('die2');
   const die3El = document.getElementById('die3');
   const totalEl = document.getElementById('total');
   const resultLabelEl = document.getElementById('resultLabel');
-  const betInput = document.getElementById('bet');
-  const rollBtn = document.getElementById('roll');
-  const hintEl = document.getElementById('hint');
+  const bowlCoverEl = document.getElementById('bowlCover');
+  const openBowlBtn = document.getElementById('openBowlBtn');
+  const myBetTaiEl = document.getElementById('myBetTai');
+  const myBetXiuEl = document.getElementById('myBetXiu');
+  const selectedBetDisplayEl = document.getElementById('selectedBetDisplay');
   const historyEl = document.getElementById('history');
 
+  // Khởi tạo hiển thị ban đầu
   updateBalanceUI();
   updateHistoryUI();
-  roundEl.textContent = String(currentRound).padStart(3, '0');
+  roundEl.textContent = String(currentRound).padStart(4, '0');
   startTimer();
 
-  document.querySelectorAll('.choice').forEach(btn => {
+  // Chọn phỉnh cược
+  document.querySelectorAll('.chip').forEach(btn => {
+    if(btn.id === 'maxBet') return;
     btn.addEventListener('click', () => {
-      if (isRolling) return;
-      document.querySelectorAll('.choice').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-pressed', 'false');
-      });
+      document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-      selectedChoice = btn.dataset.choice;
-      updateRollButton();
+      selectedChip = parseInt(btn.dataset.chip);
+      selectedBetDisplayEl.textContent = selectedChip.toLocaleString('vi-VN');
     });
   });
 
-  document.getElementById('minus').addEventListener('click', () => {
-    let val = parseInt(betInput.value) || 0;
-    betInput.value = Math.max(10, val - 10);
-    updateRollButton();
-  });
-
-  document.getElementById('plus').addEventListener('click', () => {
-    let val = parseInt(betInput.value) || 0;
-    betInput.value = val + 10;
-    updateRollButton();
-  });
-
-  document.querySelectorAll('.quick-bets button[data-bet]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      betInput.value = btn.dataset.bet;
-      updateRollButton();
-    });
-  });
-
+  // Phỉnh TẤT TAY (Max Bet)
   document.getElementById('maxBet').addEventListener('click', () => {
-    betInput.value = balance;
-    updateRollButton();
+    document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+    document.getElementById('maxBet').classList.add('active');
+    selectedChip = balance;
+    selectedBetDisplayEl.textContent = selectedChip.toLocaleString('vi-VN');
   });
 
-  betInput.addEventListener('input', updateRollButton);
+  // Đặt cược vào cửa TÀI hoặc XỈU
+  document.querySelectorAll('.gate-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (gameState !== 'betting') {
+        alert('Đã hết thời gian đặt cược phiên này!');
+        return;
+      }
 
-  rollBtn.addEventListener('click', () => {
-    if (!selectedChoice || isRolling) return;
-    const betAmount = parseInt(betInput.value);
+      const choice = btn.dataset.choice;
+      const amountToBet = selectedChip;
 
-    if (isNaN(betAmount) || betAmount < 10) {
-      alert('Mức cược tối thiểu là 10 điểm!');
-      return;
-    }
+      if (amountToBet <= 0) {
+        alert('Vui lòng chọn mức cược hợp lệ!');
+        return;
+      }
 
-    if (betAmount > balance) {
-      alert('Số dư điểm không đủ!');
-      return;
-    }
+      if (amountToBet > balance) {
+        alert('Số dư tài khoản không đủ để đặt cược mức này!');
+        return;
+      }
 
-    // Trừ tiền cược ngay khi xác nhận đặt cược
-    balance -= betAmount;
-    updateBalanceUI();
-
-    executeRoll(betAmount);
+      // Trừ tiền ngay khi đặt cược
+      balance -= amountToBet;
+      myBets[choice] += amountToBet;
+      
+      updateBalanceUI();
+      updateMyBetsUI();
+    });
   });
 
+  // Đặt lại ví điểm về 10tr
   document.getElementById('reset').addEventListener('click', () => {
-    if (confirm('Bạn có muốn đặt lại số dư về 100.000 điểm không?')) {
-      balance = 100000;
+    if (confirm('Khôi phục ví điểm về 10.000.000?')) {
+      balance = 10000000;
       history = [];
-      localStorage.removeItem('tx_history');
+      localStorage.removeItem('sun_history');
       updateBalanceUI();
       updateHistoryUI();
     }
   });
 
+  // Bấm vào Bát hoặc Nút "Mở Bát" để mở kết quả
+  bowlCoverEl.addEventListener('click', revealDice);
+  openBowlBtn.addEventListener('click', revealDice);
+
   function startTimer() {
     clearInterval(timerInterval);
-    timer = 30;
-    updateTimerUI();
+    timer = 40;
+    gameState = 'betting';
+    myBets = { tai: 0, xiu: 0 };
+    updateMyBetsUI();
+
+    bowlCoverEl.classList.add('hidden'); // Úp bát lại (ẩn đi hoặc hiện tùy logic, ở đây chuẩn bị cho ván mới)
+    openBowlBtn.style.display = 'none';
+    statusEl.textContent = 'ĐANG ĐẶT CƯỢC';
+    statusEl.style.color = '#38bdf8';
+    resultLabelEl.textContent = '';
+    totalEl.textContent = '—';
+    
+    // Xáo trộn xúc xắc tạo hiệu ứng chờ
+    die1El.textContent = diceGlyphs[Math.floor(Math.random() * 6)];
+    die2El.textContent = diceGlyphs[Math.floor(Math.random() * 6)];
+    die3El.textContent = diceGlyphs[Math.floor(Math.random() * 6)];
 
     timerInterval = setInterval(() => {
       timer--;
-      updateTimerUI();
+      countdownEl.textContent = `${timer}s`;
+
+      if (timer <= 10 && gameState === 'betting') {
+        statusEl.textContent = 'SẮP ĐÓNG CƯỢC';
+        statusEl.style.color = '#f59e0b';
+      }
 
       if (timer <= 0) {
-        if (!isRolling && selectedChoice) {
-          rollBtn.click();
-        } else if (!isRolling) {
-          nextRound();
-        }
+        clearInterval(timerInterval);
+        lockBettingAndRoll();
       }
     }, 1000);
   }
 
-  function updateTimerUI() {
-    countdownEl.textContent = `${timer}s`;
-    timerBarEl.style.width = `${(timer / 30) * 100}%`;
+  // Khóa cược, lắc xúc xắc ngầm và úp Bát chờ người chơi mở
+  function lockBettingAndRoll() {
+    gameState = 'waiting_open';
+    statusEl.textContent = 'HẾT GIỜ - CHỜ MỞ BÁT';
+    statusEl.style.color = '#ef4444';
+    countdownEl.textContent = '0s';
+
+    // Random kết quả trước
+    const d1 = Math.floor(Math.random() * 6) + 1;
+    const d2 = Math.floor(Math.random() * 6) + 1;
+    const d3 = Math.floor(Math.random() * 6) + 1;
+    finalDice = [d1, d2, d3];
+
+    // Úp bát xuống để người chơi tự bấm mở bát
+    bowlCoverEl.classList.remove('hidden');
+    openBowlBtn.style.display = 'block';
   }
 
-  function updateRollButton() {
-    const betAmount = parseInt(betInput.value) || 0;
-    if (!selectedChoice) {
-      rollBtn.disabled = true;
-      rollBtn.textContent = 'CHỌN TÀI HOẶC XỈU';
-    } else if (betAmount > balance) {
-      rollBtn.disabled = true;
-      rollBtn.textContent = 'SỐ DƯ KHÔNG ĐỦ';
-    } else if (betAmount < 10) {
-      rollBtn.disabled = true;
-      rollBtn.textContent = 'CƯỢC TỐI THIỂU 10';
+  // Hành động Mở Bát
+  function revealDice() {
+    if (gameState !== 'waiting_open') return;
+    gameState = 'result';
+
+    // Ẩn bát
+    bowlCoverEl.classList.add('hidden');
+    openBowlBtn.style.display = 'none';
+
+    const d1 = finalDice[0];
+    const d2 = finalDice[1];
+    const d3 = finalDice[2];
+    const total = d1 + d2 + d3;
+    const resultStr = total >= 11 ? 'tai' : 'xiu';
+
+    die1El.textContent = diceGlyphs[d1 - 1];
+    die2El.textContent = diceGlyphs[d2 - 1];
+    die3El.textContent = diceGlyphs[d3 - 1];
+    totalEl.textContent = total;
+
+    // Kiểm tra thắng thua
+    let totalWin = 0;
+    let totalBetOnWinningGate = myBets[resultStr];
+
+    if (totalBetOnWinningGate > 0) {
+      // Tỷ lệ trả thưởng 1 ăn 0.98 chuẩn Sunwin
+      let bonus = Math.floor(totalBetOnWinningGate * 1.98);
+      balance += bonus;
+      totalWin = bonus - totalBetOnWinningGate;
+      resultLabelEl.textContent = `🎉 THẮNG +${bonus.toLocaleString('vi-VN')} (${resultStr.toUpperCase()})`;
+      resultLabelEl.style.color = '#10b981';
     } else {
-      rollBtn.disabled = false;
-      rollBtn.textContent = `ĐẶT CƯỢC (${betAmount.toLocaleString('vi-VN')} ĐIỂM)`;
-    }
-  }
-
-  function executeRoll(betAmount) {
-    isRolling = true;
-    rollBtn.disabled = true;
-    statusEl.textContent = 'ĐANG LẮC...';
-    hintEl.textContent = 'Đang chờ kết quả...';
-
-    let rollEffect = setInterval(() => {
-      die1El.textContent = diceGlyphs[Math.floor(Math.random() * 6)];
-      die2El.textContent = diceGlyphs[Math.floor(Math.random() * 6)];
-      die3El.textContent = diceGlyphs[Math.floor(Math.random() * 6)];
-    }, 100);
-
-    setTimeout(() => {
-      clearInterval(rollEffect);
-
-      const d1 = Math.floor(Math.random() * 6) + 1;
-      const d2 = Math.floor(Math.random() * 6) + 1;
-      const d3 = Math.floor(Math.random() * 6) + 1;
-      const total = d1 + d2 + d3;
-      const resultStr = total >= 11 ? 'tai' : 'xiu';
-
-      die1El.textContent = diceGlyphs[d1 - 1];
-      die2El.textContent = diceGlyphs[d2 - 1];
-      die3El.textContent = diceGlyphs[d3 - 1];
-      totalEl.textContent = total;
-
-      const isWin = selectedChoice === resultStr;
-      
-      // Xử lý trả thưởng chuẩn xác (cộng tiền thắng vào số dư hiện tại)
-      if (isWin) {
-        const winAmount = Math.floor(betAmount * 1.98);
-        balance += winAmount;
-        resultLabelEl.textContent = `THẮNG +${winAmount.toLocaleString('vi-VN')} điểm (${resultStr.toUpperCase()})`;
-        resultLabelEl.style.color = '#10b981';
-      } else {
-        resultLabelEl.textContent = `THUA -${betAmount.toLocaleString('vi-VN')} điểm (${resultStr.toUpperCase()})`;
+      let totalLost = myBets.tai + myBets.xiu;
+      if (totalLost > 0) {
+        resultLabelEl.textContent = `❌ THUA -${totalLost.toLocaleString('vi-VN')} (${resultStr.toUpperCase()})`;
         resultLabelEl.style.color = '#ef4444';
+      } else {
+        resultLabelEl.textContent = `KẾT QUẢ: ${resultStr.toUpperCase()} (${total}đ)`;
+        resultLabelEl.style.color = '#fbbf24';
       }
+    }
 
-      updateBalanceUI();
+    updateBalanceUI();
 
-      history.unshift({
-        round: currentRound,
-        choice: selectedChoice,
-        total,
-        resultStr,
-        isWin,
-        betAmount
-      });
-      if (history.length > 20) history.pop();
-      
-      localStorage.setItem('tx_history', JSON.stringify(history));
-      updateHistoryUI();
-
-      setTimeout(() => {
-        nextRound();
-      }, 3000);
-
-    }, 2000);
-  }
-
-  function nextRound() {
-    isRolling = false;
-    currentRound++;
-    localStorage.setItem('tx_round', currentRound);
-    roundEl.textContent = String(currentRound).padStart(3, '0');
-    statusEl.textContent = 'ĐANG NHẬN CƯỢC';
-    resultLabelEl.textContent = 'Chọn cửa để bắt đầu';
-    resultLabelEl.style.color = '#38bdf8';
-    totalEl.textContent = '—';
-    hintEl.textContent = 'Chọn cửa và số điểm cược, sau đó lắc xúc xắc.';
-    
-    selectedChoice = null;
-    document.querySelectorAll('.choice').forEach(b => {
-      b.classList.remove('active');
-      b.setAttribute('aria-pressed', 'false');
+    // Lưu lịch sử
+    history.unshift({
+      round: currentRound,
+      total,
+      resultStr
     });
+    if (history.length > 15) history.pop();
+    localStorage.setItem('sun_history', JSON.stringify(history));
+    updateHistoryUI();
 
-    updateRollButton();
-    startTimer();
+    // Tự động chuyển phiên mới sau 4 giây
+    setTimeout(() => {
+      currentRound++;
+      localStorage.setItem('sun_round', currentRound);
+      roundEl.textContent = String(currentRound).padStart(4, '0');
+      startTimer();
+    }, 4000);
   }
 
   function updateBalanceUI() {
     balanceEl.textContent = balance.toLocaleString('vi-VN');
-    localStorage.setItem('tx_balance', balance);
+    localStorage.setItem('sun_balance', balance);
+  }
+
+  function updateMyBetsUI() {
+    myBetTaiEl.textContent = `Cược: ${myBets.tai.toLocaleString('vi-VN')}`;
+    myBetXiuEl.textContent = `Cược: ${myBets.xiu.toLocaleString('vi-VN')}`;
   }
 
   function updateHistoryUI() {
     if (history.length === 0) {
-      historyEl.className = 'history-empty';
-      historyEl.textContent = 'Chưa có lượt chơi nào.';
+      historyEl.innerHTML = '<span class="empty-hist">Chưa có dữ liệu</span>';
       return;
     }
 
-    historyEl.className = 'history-list';
     historyEl.innerHTML = history.map(item => `
-      <div class="history-item">
-        <span>Phiên #${String(item.round).padStart(3, '0')} (${item.choice.toUpperCase()})</span>
-        <span style="color: ${item.isWin ? '#10b981' : '#ef4444'}">
-          ${item.total} điểm • ${item.isWin ? '+' + Math.floor(item.betAmount * 1.98) : '-' + item.betAmount}
-        </span>
+      <div class="hist-dot ${item.resultStr}" title="Phiên #${item.round} - Tổng: ${item.total}">
+        ${item.resultStr === 'tai' ? 'T' : 'X'}
       </div>
     `).join('');
   }
