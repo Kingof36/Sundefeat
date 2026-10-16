@@ -1,233 +1,249 @@
-const START_BALANCE = 100000;
-const ROUND_SECONDS = 30;
-const PAYOUT_MULTIPLIER = 1.98;
-const faces = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
-const $ = (id) => document.getElementById(id);
-let balance = Number(localStorage.getItem("taixiu_balance_v2"));
-if (!Number.isFinite(balance) || balance < 0) balance = START_BALANCE;
-let round = Number(localStorage.getItem("taixiu_round_v2")) || 1;
-let selected = "";
-let busy = false;
-let betPlaced = false;
-let secondsLeft = ROUND_SECONDS;
-let countdownTimer = null;
-let rollTimeout = null;
+document.addEventListener('DOMContentLoaded', () => {
+  let balance = parseInt(localStorage.getItem('tx_balance')) || 100000;
+  let currentRound = parseInt(localStorage.getItem('tx_round')) || 1;
+  let history = JSON.parse(localStorage.getItem('tx_history')) || [];
+  
+  let selectedChoice = null;
+  let timer = 30;
+  let timerInterval = null;
+  let isRolling = false;
 
-const format = (n) => Math.floor(n).toLocaleString("vi-VN");
-function updateBalance() {
-  $("balance").textContent = format(balance);
-  localStorage.setItem("taixiu_balance_v2", String(balance));
-}
-function updateRound() {
-  $("round").textContent = String(round).padStart(3, "0");
-  localStorage.setItem("taixiu_round_v2", String(round));
-}
-function setChoice(choice) {
-  if (betPlaced || busy) return;
-  selected = choice;
-  document.querySelectorAll(".choice").forEach(btn => {
-    btn.setAttribute("aria-pressed", String(btn.dataset.choice === choice));
-  });
-  $("roll").disabled = !selected || busy || betPlaced;
-  $("roll").textContent = selected ? "XÁC NHẬN ĐẶT CƯỢC" : "CHỌN TÀI HOẶC XỈU";
-  $("hint").textContent = choice === "tai" ? "Bạn chọn Tài. Nhập số điểm rồi xác nhận cược." :
-    choice === "xiu" ? "Bạn chọn Xỉu. Nhập số điểm rồi xác nhận cược." :
-    "Chọn cửa và số điểm cược trong thời gian đếm ngược.";
-}
-function getBet() {
-  const n = Math.floor(Number($("bet").value));
-  return Number.isFinite(n) ? n : 0;
-}
-function normalizeBet() {
-  if (betPlaced || busy) return;
-  let n = getBet();
-  if (n < 10) n = 10;
-  if (n > balance) n = balance;
-  $("bet").value = n;
-}
-function updateTimerDisplay() {
-  $("countdown").textContent = `${secondsLeft}s`;
-  $("timerBar").style.width = `${(secondsLeft / ROUND_SECONDS) * 100}%`;
-  $("timerBar").classList.toggle("urgent", secondsLeft <= 5);
-}
-function addHistory(choice, dice, total, status, net, wager) {
-  const history = $("history");
-  if (history.classList.contains("history-empty")) {
-    history.className = "history-list";
-    history.textContent = "";
-  }
-  const item = document.createElement("div");
-  item.className = "history-item";
-  const left = document.createElement("div");
-  const line1 = document.createElement("div");
-  line1.textContent = `Phiên ${String(round).padStart(3, "0")} · ${dice.join(" – ")} = ${total}`;
-  const line2 = document.createElement("small");
-  line2.textContent = choice ? `Cược ${choice === "tai" ? "Tài" : "Xỉu"} · ${format(wager)} điểm` : "Không có cược";
-  left.append(line1, line2);
-  const right = document.createElement("div");
-  right.style.textAlign = "right";
-  const pill = document.createElement("span");
-  pill.className = `pill ${total >= 11 ? "tai" : "xiu"}`;
-  pill.textContent = total >= 11 ? "TÀI" : "XỈU";
-  const delta = document.createElement("div");
-  delta.className = net > 0 ? "gain" : net < 0 ? "loss" : "";
-  delta.style.marginTop = "5px";
-  delta.textContent = net > 0 ? `+${format(net)}` : net < 0 ? `−${format(-net)}` : status === "push" ? "HÒA" : "—";
-  right.append(pill, delta);
-  item.append(left, right);
-  history.prepend(item);
-  while (history.children.length > 8) history.lastElementChild.remove();
-}
-function placeBet() {
-  if (busy || betPlaced || !selected) return;
-  normalizeBet();
-  const wager = getBet();
-  if (wager < 10 || wager > balance) {
-    $("hint").textContent = "Điểm cược phải từ 10 đến số điểm hiện có.";
-    return;
-  }
-  if (secondsLeft <= 0) return;
-  balance -= wager;
-  updateBalance();
-  betPlaced = true;
-  $("bet").disabled = true;
-  document.querySelectorAll(".choice").forEach(btn => {
-    btn.disabled = true;
-  });
-  $("roll").disabled = true;
-  $("roll").textContent = "ĐÃ ĐẶT CƯỢC";
-  $("status").textContent = "ĐÃ NHẬN CƯỢC";
-  $("hint").textContent = `Đã cược ${format(wager)} điểm vào ${selected === "tai" ? "Tài" : "Xỉu"}. Chờ hết giờ để tự động lắc.`;
-}
-function resetBetControls() {
-  selected = "";
-  betPlaced = false;
-  $("bet").disabled = false;
-  document.querySelectorAll(".choice").forEach(btn => {
-    btn.disabled = false;
-    btn.setAttribute("aria-pressed", "false");
-  });
-  $("roll").disabled = true;
-  $("roll").textContent = "CHỌN TÀI HOẶC XỈU";
-  $("bet").value = Math.min(1000, balance);
-}
-async function rollRound() {
-  if (busy) return;
-  busy = true;
-  clearInterval(countdownTimer);
-  clearTimeout(rollTimeout);
-  secondsLeft = 0;
-  updateTimerDisplay();
-  $("status").textContent = "ĐANG LẮC...";
-  $("resultLabel").textContent = "Đang lắc xúc xắc…";
-  $("total").textContent = "…";
-  $("roll").disabled = true;
-  const diceEls = [$("die1"), $("die2"), $("die3")];
-  diceEls.forEach(el => el.classList.add("rolling"));
-  for (let i = 0; i < 15; i++) {
-    diceEls.forEach(el => el.textContent = faces[Math.floor(Math.random() * 6)]);
-    await new Promise(resolve => setTimeout(resolve, 60));
-  }
-  const dice = [1, 2, 3].map(() => Math.floor(Math.random() * 6) + 1);
-  diceEls.forEach((el, i) => { el.textContent = faces[dice[i] - 1]; el.classList.remove("rolling"); });
-  const total = dice.reduce((a, b) => a + b, 0);
-  const triple = dice[0] === dice[1] && dice[1] === dice[2];
-  const outcome = total <= 10 ? "xiu" : "tai";
-  $("total").textContent = total;
-  $("resultLabel").textContent = triple ? "BỘ BA" : outcome === "tai" ? "TÀI" : "XỈU";
+  const diceGlyphs = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
 
-  let net = 0;
-  let status = "none";
-  let wager = 0;
-  if (betPlaced) {
-    wager = Number($("currentWager")?.value || 0);
+  const balanceEl = document.getElementById('balance');
+  const roundEl = document.getElementById('round');
+  const statusEl = document.getElementById('status');
+  const countdownEl = document.getElementById('countdown');
+  const timerBarEl = document.getElementById('timerBar');
+  const die1El = document.getElementById('die1');
+  const die2El = document.getElementById('die2');
+  const die3El = document.getElementById('die3');
+  const totalEl = document.getElementById('total');
+  const resultLabelEl = document.getElementById('resultLabel');
+  const betInput = document.getElementById('bet');
+  const rollBtn = document.getElementById('roll');
+  const hintEl = document.getElementById('hint');
+  const historyEl = document.getElementById('history');
+
+  updateBalanceUI();
+  updateHistoryUI();
+  roundEl.textContent = String(currentRound).padStart(3, '0');
+  startTimer();
+
+  document.querySelectorAll('.choice').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (isRolling) return;
+      document.querySelectorAll('.choice').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+      selectedChoice = btn.dataset.choice;
+      updateRollButton();
+    });
+  });
+
+  document.getElementById('minus').addEventListener('click', () => {
+    let val = parseInt(betInput.value) || 0;
+    betInput.value = Math.max(10, val - 10);
+    updateRollButton();
+  });
+
+  document.getElementById('plus').addEventListener('click', () => {
+    let val = parseInt(betInput.value) || 0;
+    betInput.value = val + 10;
+    updateRollButton();
+  });
+
+  document.querySelectorAll('.quick-bets button[data-bet]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      betInput.value = btn.dataset.bet;
+      updateRollButton();
+    });
+  });
+
+  document.getElementById('maxBet').addEventListener('click', () => {
+    betInput.value = balance;
+    updateRollButton();
+  });
+
+  betInput.addEventListener('input', updateRollButton);
+
+  rollBtn.addEventListener('click', () => {
+    if (!selectedChoice || isRolling) return;
+    const betAmount = parseInt(betInput.value);
+
+    if (isNaN(betAmount) || betAmount < 10) {
+      alert('Mức cược tối thiểu là 10 điểm!');
+      return;
+    }
+
+    if (betAmount > balance) {
+      alert('Số dư điểm không đủ!');
+      return;
+    }
+
+    // Trừ tiền cược ngay khi xác nhận đặt cược
+    balance -= betAmount;
+    updateBalanceUI();
+
+    executeRoll(betAmount);
+  });
+
+  document.getElementById('reset').addEventListener('click', () => {
+    if (confirm('Bạn có muốn đặt lại số dư về 100.000 điểm không?')) {
+      balance = 100000;
+      history = [];
+      localStorage.removeItem('tx_history');
+      updateBalanceUI();
+      updateHistoryUI();
+    }
+  });
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timer = 30;
+    updateTimerUI();
+
+    timerInterval = setInterval(() => {
+      timer--;
+      updateTimerUI();
+
+      if (timer <= 0) {
+        if (!isRolling && selectedChoice) {
+          rollBtn.click();
+        } else if (!isRolling) {
+          nextRound();
+        }
+      }
+    }, 1000);
   }
-  // Cược đã trừ khỏi ví lúc xác nhận; khi thắng nhận lại 1,98 lần tiền cược.
-  if (window.currentBet && window.currentBet.amount > 0) {
-    wager = window.currentBet.amount;
-    if (!triple && outcome === window.currentBet.choice) {
-      const payout = Math.floor(wager * PAYOUT_MULTIPLIER);
-      balance += payout;
-      net = payout - wager;
-      status = "win";
-      $("hint").textContent = `Bạn thắng! Nhận ${format(payout)} điểm (lãi ${format(net)} điểm).`;
+
+  function updateTimerUI() {
+    countdownEl.textContent = `${timer}s`;
+    timerBarEl.style.width = `${(timer / 30) * 100}%`;
+  }
+
+  function updateRollButton() {
+    const betAmount = parseInt(betInput.value) || 0;
+    if (!selectedChoice) {
+      rollBtn.disabled = true;
+      rollBtn.textContent = 'CHỌN TÀI HOẶC XỈU';
+    } else if (betAmount > balance) {
+      rollBtn.disabled = true;
+      rollBtn.textContent = 'SỐ DƯ KHÔNG ĐỦ';
+    } else if (betAmount < 10) {
+      rollBtn.disabled = true;
+      rollBtn.textContent = 'CƯỢC TỐI THIỂU 10';
     } else {
-      net = -wager;
-      status = "loss";
-      $("hint").textContent = triple ? `Ra bộ ba, cược thua ${format(wager)} điểm.` : `Bạn thua ${format(wager)} điểm.`;
+      rollBtn.disabled = false;
+      rollBtn.textContent = `ĐẶT CƯỢC (${betAmount.toLocaleString('vi-VN')} ĐIỂM)`;
     }
-  } else {
-    $("hint").textContent = "Phiên vừa rồi bạn không đặt cược.";
   }
-  window.currentBet = null;
-  updateBalance();
-  addHistory(wager ? (status === "none" ? "" : (lastChoiceForHistory || "")) : "", dice, total, status, net, wager);
-  $("status").textContent = triple ? "BỘ BA" : status === "win" ? "THẮNG" : status === "loss" ? "THUA" : "KẾT THÚC";
-  round++;
-  updateRound();
-  resetBetControls();
-  busy = false;
-  startNewRound();
-}
-let lastChoiceForHistory = "";
-function confirmBet() {
-  if (busy || betPlaced || !selected) return;
-  normalizeBet();
-  const amount = getBet();
-  if (amount < 10 || amount > balance) {
-    $("hint").textContent = "Điểm cược không hợp lệ.";
-    return;
+
+  function executeRoll(betAmount) {
+    isRolling = true;
+    rollBtn.disabled = true;
+    statusEl.textContent = 'ĐANG LẮC...';
+    hintEl.textContent = 'Đang chờ kết quả...';
+
+    let rollEffect = setInterval(() => {
+      die1El.textContent = diceGlyphs[Math.floor(Math.random() * 6)];
+      die2El.textContent = diceGlyphs[Math.floor(Math.random() * 6)];
+      die3El.textContent = diceGlyphs[Math.floor(Math.random() * 6)];
+    }, 100);
+
+    setTimeout(() => {
+      clearInterval(rollEffect);
+
+      const d1 = Math.floor(Math.random() * 6) + 1;
+      const d2 = Math.floor(Math.random() * 6) + 1;
+      const d3 = Math.floor(Math.random() * 6) + 1;
+      const total = d1 + d2 + d3;
+      const resultStr = total >= 11 ? 'tai' : 'xiu';
+
+      die1El.textContent = diceGlyphs[d1 - 1];
+      die2El.textContent = diceGlyphs[d2 - 1];
+      die3El.textContent = diceGlyphs[d3 - 1];
+      totalEl.textContent = total;
+
+      const isWin = selectedChoice === resultStr;
+      
+      // Xử lý trả thưởng chuẩn xác (cộng tiền thắng vào số dư hiện tại)
+      if (isWin) {
+        const winAmount = Math.floor(betAmount * 1.98);
+        balance += winAmount;
+        resultLabelEl.textContent = `THẮNG +${winAmount.toLocaleString('vi-VN')} điểm (${resultStr.toUpperCase()})`;
+        resultLabelEl.style.color = '#10b981';
+      } else {
+        resultLabelEl.textContent = `THUA -${betAmount.toLocaleString('vi-VN')} điểm (${resultStr.toUpperCase()})`;
+        resultLabelEl.style.color = '#ef4444';
+      }
+
+      updateBalanceUI();
+
+      history.unshift({
+        round: currentRound,
+        choice: selectedChoice,
+        total,
+        resultStr,
+        isWin,
+        betAmount
+      });
+      if (history.length > 20) history.pop();
+      
+      localStorage.setItem('tx_history', JSON.stringify(history));
+      updateHistoryUI();
+
+      setTimeout(() => {
+        nextRound();
+      }, 3000);
+
+    }, 2000);
   }
-  lastChoiceForHistory = selected;
-  window.currentBet = { choice: selected, amount };
-  placeBet();
-}
-function startNewRound() {
-  secondsLeft = ROUND_SECONDS;
-  updateTimerDisplay();
-  $("status").textContent = "ĐANG NHẬN CƯỢC";
-  countdownTimer = setInterval(() => {
-    secondsLeft--;
-    if (secondsLeft < 0) secondsLeft = 0;
-    updateTimerDisplay();
-    if (secondsLeft <= 0) {
-      clearInterval(countdownTimer);
-      rollTimeout = setTimeout(rollRound, 100);
+
+  function nextRound() {
+    isRolling = false;
+    currentRound++;
+    localStorage.setItem('tx_round', currentRound);
+    roundEl.textContent = String(currentRound).padStart(3, '0');
+    statusEl.textContent = 'ĐANG NHẬN CƯỢC';
+    resultLabelEl.textContent = 'Chọn cửa để bắt đầu';
+    resultLabelEl.style.color = '#38bdf8';
+    totalEl.textContent = '—';
+    hintEl.textContent = 'Chọn cửa và số điểm cược, sau đó lắc xúc xắc.';
+    
+    selectedChoice = null;
+    document.querySelectorAll('.choice').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
+
+    updateRollButton();
+    startTimer();
+  }
+
+  function updateBalanceUI() {
+    balanceEl.textContent = balance.toLocaleString('vi-VN');
+    localStorage.setItem('tx_balance', balance);
+  }
+
+  function updateHistoryUI() {
+    if (history.length === 0) {
+      historyEl.className = 'history-empty';
+      historyEl.textContent = 'Chưa có lượt chơi nào.';
+      return;
     }
-  }, 1000);
-}
-document.querySelectorAll(".choice").forEach(btn => btn.addEventListener("click", () => setChoice(btn.dataset.choice)));
-document.querySelectorAll("[data-bet]").forEach(btn => btn.addEventListener("click", () => {
-  if (betPlaced || busy) return;
-  $("bet").value = Math.min(Number(btn.dataset.bet), balance);
-  normalizeBet();
-}));
-$("minus").addEventListener("click", () => { if (!betPlaced && !busy) { $("bet").value = Math.max(10, getBet() - 10); normalizeBet(); } });
-$("plus").addEventListener("click", () => { if (!betPlaced && !busy) { $("bet").value = Math.min(balance, getBet() + 10); normalizeBet(); } });
-$("maxBet").addEventListener("click", () => { if (!betPlaced && !busy) { $("bet").value = balance; normalizeBet(); } });
-$("bet").addEventListener("change", normalizeBet);
-$("roll").addEventListener("click", confirmBet);
-$("reset").addEventListener("click", () => {
-  if (busy) return;
-  if (!confirm("Đặt lại điểm về 100.000 và xóa lịch sử trên trình duyệt này?")) return;
-  clearInterval(countdownTimer);
-  clearTimeout(rollTimeout);
-  balance = START_BALANCE;
-  round = 1;
-  window.currentBet = null;
-  localStorage.removeItem("taixiu_balance_v2");
-  localStorage.removeItem("taixiu_round_v2");
-  $("history").className = "history-empty";
-  $("history").textContent = "Chưa có lượt chơi nào.";
-  $("total").textContent = "—";
-  $("resultLabel").textContent = "Chờ phiên đầu tiên";
-  updateBalance();
-  updateRound();
-  resetBetControls();
-  startNewRound();
+
+    historyEl.className = 'history-list';
+    historyEl.innerHTML = history.map(item => `
+      <div class="history-item">
+        <span>Phiên #${String(item.round).padStart(3, '0')} (${item.choice.toUpperCase()})</span>
+        <span style="color: ${item.isWin ? '#10b981' : '#ef4444'}">
+          ${item.total} điểm • ${item.isWin ? '+' + Math.floor(item.betAmount * 1.98) : '-' + item.betAmount}
+        </span>
+      </div>
+    `).join('');
+  }
 });
-updateBalance();
-updateRound();
-$("bet").value = Math.min(1000, balance);
-setChoice("");
-startNewRound();
