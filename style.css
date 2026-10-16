@@ -1,4 +1,351 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
-:root{color-scheme:dark;--bg:#0b1120;--panel:#141e31;--line:#27364e;--muted:#9baac1;--gold:#ffd166;--cyan:#56d9e8}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -10%,#20365a 0%,#0b1120 55%);font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#f5f7fb;min-height:100vh}.app{max-width:620px;margin:0 auto;padding:20px 16px 28px}.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 2px 22px}.brand{display:flex;gap:10px;align-items:center}.brand-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:#263956;font-size:25px}.brand strong{display:block;letter-spacing:1.5px;font-size:15px}.brand small{font-size:9px;letter-spacing:1.4px;color:var(--muted)}.balance{background:#18253a;border:1px solid #34445d;border-radius:13px;padding:8px 13px;text-align:right}.balance span{display:block;color:var(--muted);font-size:10px}.balance strong{font-size:18px;color:var(--gold)}.hero{text-align:center;padding:8px 0 22px}.eyebrow{font-size:10px;letter-spacing:3px;color:var(--cyan);font-weight:800}.hero h1{font-size:clamp(27px,6vw,37px);margin:8px 0;font-weight:800;letter-spacing:-1px}.hero h1 span{color:var(--gold)}.subtitle{font-size:12px;color:var(--muted);line-height:1.6;margin:0 auto;max-width:420px}.game-card,.history-card{background:linear-gradient(145deg,rgba(25,38,60,.98),rgba(16,25,41,.98));border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 18px 55px #0003}.round-row{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:10px;letter-spacing:1px}.round-row b{color:#f7f9ff}.status{color:var(--cyan);font-weight:800}.dice-area{display:flex;justify-content:center;gap:12px;padding:26px 0 18px}.die{display:grid;place-items:center;width:76px;height:76px;border-radius:17px;background:linear-gradient(145deg,#fff,#d9e3f3);color:#18253a;font-family:serif;font-size:52px;box-shadow:0 7px 0 #9cabc0,0 12px 20px #0003;transition:transform .2s}.die.rolling{animation:shake .14s infinite alternate}@keyframes shake{from{transform:rotate(-8deg) translateY(-2px)}to{transform:rotate(8deg) translateY(2px)}}.result-box{text-align:center;border:1px solid #2c3d55;background:#0e1727;border-radius:15px;padding:12px;margin-bottom:23px}.result-box span{display:block;font-size:9px;letter-spacing:2px;color:var(--muted)}.result-box strong{display:block;font-size:34px;line-height:1.25;color:var(--gold)}.result-box b{display:block;font-size:12px}.bet-title{display:flex;justify-content:space-between;align-items:center;margin:17px 0 11px;font-size:12px;font-weight:700}.bet-title small{font-size:9px;font-weight:500;color:var(--muted)}.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{cursor:pointer;border:1px solid #34445e;border-radius:15px;background:#1a2940;color:#f5f7fb;padding:13px 8px;display:flex;align-items:center;flex-direction:column;gap:4px;font-family:inherit}.choice span{font-size:18px}.choice strong{font-size:15px;letter-spacing:1px}.choice small{font-size:10px;color:#b7c4d8}.choice.tai span{color:#ff8e72}.choice.xiu span{color:#70caff}.choice[aria-pressed="true"]{border-color:var(--gold);background:#3a3426;box-shadow:0 0 0 1px var(--gold) inset}.bet-control{display:flex;gap:9px}.stepper{width:46px;border:1px solid #3a4b65;background:#202f47;color:white;border-radius:11px;font-size:24px;cursor:pointer}.bet-control input{min-width:0;flex:1;text-align:center;background:#0d1727;border:1px solid #34445e;border-radius:11px;color:#fff;font:700 18px 'Be Vietnam Pro',sans-serif;padding:11px}.quick-bets{display:flex;gap:7px;margin:9px 0 17px}.quick-bets button{flex:1;min-width:0;border:1px solid #33445d;background:#1a2940;color:#dbe5f4;border-radius:8px;padding:8px 2px;font-size:10px;cursor:pointer}.quick-bets #maxBet{color:var(--gold)}.roll-button{width:100%;border:0;border-radius:13px;padding:15px;background:linear-gradient(90deg,#f6bd4b,#ffdf83);color:#30220b;font:800 13px 'Be Vietnam Pro',sans-serif;letter-spacing:1px;cursor:pointer;box-shadow:0 5px 0 #b77a21}.roll-button:disabled{filter:grayscale(.5);opacity:.6;cursor:not-allowed;box-shadow:none}.hint{margin:13px 0 0;text-align:center;color:var(--muted);font-size:10px;line-height:1.5}.history-card{margin-top:15px;padding:17px 20px}.history-heading{display:flex;justify-content:space-between;align-items:center}.history-heading h2{font-size:14px;margin:0}.reset{border:0;background:transparent;color:var(--muted);font:inherit;font-size:10px;cursor:pointer}.history-empty{text-align:center;color:var(--muted);font-size:11px;padding:22px 0 8px}.history-list{display:flex;flex-direction:column;gap:8px;margin-top:13px}.history-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border:1px solid #2a3a52;background:#101a2b;border-radius:10px;font-size:11px}.history-item small{color:var(--muted);display:block;margin-top:3px}.pill{border-radius:6px;padding:5px 7px;font-size:9px;font-weight:800}.pill.tai{background:#512f2b;color:#ffb1a0}.pill.xiu{background:#203d56;color:#9bdcff}.gain{color:#8de3b0;font-weight:800}.loss{color:#ff9b9b;font-weight:800}footer{text-align:center;color:#687991;font-size:10px;padding:18px 0 0}@media(max-width:380px){.game-card{padding:15px}.die{width:64px;height:64px;font-size:45px}.bet-title small{font-size:8px}}
-.timer-wrap{margin:0 0 8px;padding:0 2px}.timer-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;color:var(--muted);font-size:9px;letter-spacing:1px}.timer-label strong{font-size:16px;color:var(--gold);letter-spacing:0}.timer-track{height:6px;border-radius:20px;background:#0b1321;overflow:hidden}.timer-bar{height:100%;width:100%;border-radius:20px;background:linear-gradient(90deg,#5ce0c0,#ffd166);transition:width .25s linear}.timer-bar.urgent{background:linear-gradient(90deg,#ff8e72,#ffce70)}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+  background-color: #0b0f19;
+  color: #f3f4f6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+.app {
+  width: 100%;
+  max-width: 1050px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #111827;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid #1f2937;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-icon {
+  font-size: 1.8rem;
+}
+
+.brand strong {
+  display: block;
+  font-size: 1.1rem;
+  color: #f97316;
+}
+
+.brand small {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.balance {
+  text-align: right;
+}
+
+.balance span {
+  display: block;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.balance strong {
+  font-size: 1.25rem;
+  color: #10b981;
+}
+
+.hero {
+  text-align: center;
+}
+
+.hero .eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: #f97316;
+  font-weight: bold;
+}
+
+.hero h1 {
+  font-size: 1.5rem;
+  margin: 0.2rem 0;
+}
+
+.hero h1 span {
+  color: #38bdf8;
+}
+
+.hero .subtitle {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* Layout chính linh hoạt cho màn hình ngang / rộng */
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.game-card, .history-card {
+  background: #111827;
+  border-radius: 16px;
+  padding: 1.25rem;
+  border: 1px solid #1f2937;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.round-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.status {
+  color: #eab308;
+  font-weight: bold;
+}
+
+.timer-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.timer-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.timer-track {
+  height: 6px;
+  background: #1f2937;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.timer-bar {
+  height: 100%;
+  width: 100%;
+  background: #3b82f6;
+  transition: width 1s linear;
+}
+
+.dice-area {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 2.8rem;
+  padding: 0.25rem 0;
+}
+
+.die {
+  background: #ffffff;
+  color: #111827;
+  border-radius: 12px;
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.result-box {
+  text-align: center;
+  background: #1f2937;
+  padding: 0.6rem;
+  border-radius: 10px;
+}
+
+.result-box span {
+  display: block;
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.result-box strong {
+  font-size: 1.35rem;
+  color: #f3f4f6;
+}
+
+.result-box b {
+  display: block;
+  font-size: 0.8rem;
+  color: #38bdf8;
+  margin-top: 0.15rem;
+}
+
+.bet-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.bet-title small {
+  color: #9ca3af;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.choice {
+  padding: 0.6rem;
+  border: 2px solid #374151;
+  background: transparent;
+  color: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.choice.tai.active {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.choice.xiu.active {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.bet-control {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.stepper {
+  width: 40px;
+  height: 40px;
+  background: #374151;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.bet-control input {
+  flex: 1;
+  background: #1f2937;
+  border: 1px solid #374151;
+  color: #fff;
+  text-align: center;
+  font-size: 1.05rem;
+  border-radius: 8px;
+}
+
+.quick-bets {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.35rem;
+}
+
+.quick-bets button {
+  background: #1f2937;
+  border: 1px solid #374151;
+  color: #d1d5db;
+  padding: 0.35rem 0;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.roll-button {
+  background: #f97316;
+  color: #fff;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.roll-button:disabled {
+  background: #374151;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: 0.7rem;
+  text-align: center;
+  color: #9ca3af;
+}
+
+.history-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-heading h2 {
+  font-size: 1rem;
+}
+
+.reset {
+  background: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.history-empty, .history-list {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #1f2937;
+}
+
+footer {
+  text-align: center;
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+/* Tối ưu hóa hiển thị khi màn hình ngang (landscape) hoặc màn hình máy tính / tablet */
+@media (min-width: 768px), (orientation: landscape) and (max-height: 700px) {
+  .hero {
+    display: none; /* Ẩn phần tiêu đề phụ để tiết kiệm không gian màn hình ngang */
+  }
+  .main-content {
+    grid-template-columns: 1.25fr 0.75fr;
+  }
+}
