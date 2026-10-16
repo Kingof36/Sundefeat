@@ -3,59 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#101827">
-  <title>Tài Xỉu — Mini Game</title>
+  <meta name="theme-color" content="#0b0e14">
+  <title>Tài Xỉu — Sun.win Style</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div class="brand"><span class="brand-icon">🎲</span><div><strong>TÀI XỈU</strong><small>MINI GAME • ĐIỂM ẢO</small></div></div>
-      <div class="balance"><span>Ví điểm thử</span><strong id="balance">100.000</strong></div>
+  <div class="sunwin-container">
+    <!-- Header / Thanh thông tin người chơi -->
+    <header class="sun-header">
+      <div class="user-box">
+        <div class="avatar">👑</div>
+        <div class="user-info">
+          <span class="username">Thành Viên Sun</span>
+          <span class="balance" id="balance">10.000.000</span>
+        </div>
+      </div>
+      <div class="room-title">
+        <span>TÀI XỈU </span>
+        <small>Phiên #<b id="round">0125</b></small>
+      </div>
+      <button id="reset" class="btn-reset" title="Nạp lại 10tr">🔄</button>
     </header>
 
-    <section class="hero">
-      <p class="eyebrow">THỬ VẬN MAY CỦA BẠN</p>
-      <h1>Đoán đúng — <span>Nhận điểm</span></h1>
-      <p class="subtitle">Mỗi phiên tự lắc sau 30 giây • Vốn ban đầu 100.000 điểm ảo • Không có tiền thật.</p>
-    </section>
+    <!-- Khu vực chính bàn chơi Tài Xỉu -->
+    <main class="sun-table">
+      <!-- Bảng hiển thị thời gian & trạng thái -->
+      <div class="table-status-bar">
+        <span id="status" class="status-text">ĐANG ĐẶT CƯỢC</span>
+        <div class="timer-badge" id="countdown">50s</div>
+      </div>
 
-    <div class="main-content">
-      <section class="game-card">
-        <div class="round-row"><span>PHIÊN <b id="round">001</b></span><span id="status" class="status">ĐANG NHẬN CƯỢC</span></div>
-        <div class="timer-wrap"><div class="timer-label"><span>THỜI GIAN CÒN LẠI</span><strong id="countdown">30s</strong></div><div class="timer-track"><div id="timerBar" class="timer-bar"></div></div></div>
-        <div class="dice-area" aria-label="Ba viên xúc xắc">
-          <div class="die" id="die1">⚀</div><div class="die" id="die2">⚁</div><div class="die" id="die3">⚂</div>
+      <!-- Hũ lắc xúc xắc (Bát & Đĩa phong cách Sunwin) -->
+      <div class="bowl-container">
+        <div class="dice-plate">
+          <div class="dice-box" id="diceBox">
+            <div class="die" id="die1">⚀</div>
+            <div class="die" id="die2">⚁</div>
+            <div class="die" id="die3">⚂</div>
+          </div>
+          <!-- Bát úp / Nút Mở Bát -->
+          <div id="bowlCover" class="bowl-cover hidden">
+            <span>ĐẬP BÁT / MỞ</span>
+          </div>
         </div>
-        <div class="result-box">
-          <span>TỔNG ĐIỂM</span><strong id="total">—</strong><b id="resultLabel">Chọn cửa để bắt đầu</b>
+        <div class="total-result" id="totalResultBox">
+          Tổng: <strong id="total">—</strong> <span id="resultLabel"></span>
+        </div>
+      </div>
+
+      <!-- Cửa cược Tài / Xỉu lớn -->
+      <div class="bet-gates">
+        <!-- Cửa XỈU -->
+        <button class="gate-btn xiu-gate" data-choice="xiu">
+          <div class="gate-info">
+            <span class="gate-name">XỈU</span>
+            <span class="gate-desc">4 – 10 điểm</span>
+          </div>
+          <div class="my-bet-tag" id="myBetXiu">Cược: 0</div>
+        </button>
+
+        <!-- Cửa TÀI -->
+        <button class="gate-btn tai-gate" data-choice="tai">
+          <div class="gate-info">
+            <span class="gate-name">TÀI</span>
+            <span class="gate-desc">11 – 17 điểm</span>
+          </div>
+          <div class="my-bet-tag" id="myBetTai">Cược: 0</div>
+        </button>
+      </div>
+
+      <!-- Thanh chọn phỉnh cược nhanh & điều khiển -->
+      <div class="control-panel">
+        <div class="chip-selector">
+          <button class="chip active" data-chip="1000">1K</button>
+          <button class="chip" data-chip="10000">10K</button>
+          <button class="chip" data-chip="50000">50K</button>
+          <button class="chip" data-chip="100000">100K</button>
+          <button class="chip" data-chip="500000">500K</button>
+          <button class="chip max" id="maxBet">TẤT TAY</button>
         </div>
 
-        <div class="bet-title"><span>1. Chọn cửa</span><small>Xỉu ≤ 10 • Tài ≥ 11</small></div>
-        <div class="choices">
-          <button class="choice tai" data-choice="tai" aria-pressed="false"><span>▲</span><strong>TÀI</strong><small>11 – 17 điểm</small></button>
-          <button class="choice xiu" data-choice="xiu" aria-pressed="false"><span>▼</span><strong>XỈU</strong><small>4 – 10 điểm</small></button>
+        <div class="action-row">
+          <div class="current-selected-bet">
+            <span>Đang chọn cược:</span>
+            <strong id="selectedBetDisplay">1.000</strong>
+          </div>
+          <button id="openBowlBtn" class="btn-open-bowl" style="display: none;">MỞ BÁT ⚡</button>
         </div>
+      </div>
+    </main>
 
-        <div class="bet-title"><span>2. Đặt điểm</span><small>Trả thưởng 1,98× tổng cược</small></div>
-        <div class="bet-control">
-          <button id="minus" class="stepper" aria-label="Giảm điểm cược">−</button>
-          <input id="bet" type="number" min="10" step="10" value="100" inputmode="numeric" aria-label="Số điểm cược">
-          <button id="plus" class="stepper" aria-label="Tăng điểm cược">+</button>
-        </div>
-        <div class="quick-bets"><button data-bet="50">50</button><button data-bet="100">100</button><button data-bet="250">250</button><button data-bet="500">500</button><button id="maxBet">TỐI ĐA</button></div>
-        <button id="roll" class="roll-button" disabled>CHỌN TÀI HOẶC XỈU</button>
-        <p class="hint" id="hint">Chọn cửa và số điểm cược, sau đó lắc xúc xắc.</p>
-      </section>
-
-      <section class="history-card">
-        <div class="history-heading"><h2>Lịch sử phiên</h2><button id="reset" class="reset">Đặt lại điểm</button></div>
-        <div id="history" class="history-empty">Chưa có lượt chơi nào.</div>
-      </section>
-    </div>
-    
-    <footer>Mini game giải trí • Điểm chỉ lưu trên trình duyệt này.</footer>
-  </main>
-  <script src="app.js"></script>
-</body>
-</html>
+    <!-- L
