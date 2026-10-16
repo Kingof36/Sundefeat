@@ -1,492 +1,61 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Tài Xỉu Sunwin Full Screen</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,800&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101827">
+  <title>Tài Xỉu — Mini Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-icon">🎲</span><div><strong>TÀI XỈU</strong><small>MINI GAME • ĐIỂM ẢO</small></div></div>
+      <div class="balance"><span>Ví điểm thử</span><strong id="balance">100.000</strong></div>
+    </header>
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #030008;
-            font-family: 'Montserrat', sans-serif;
-            color: #fff;
-            position: fixed;
-        }
+    <section class="hero">
+      <p class="eyebrow">THỬ VẬN MAY CỦA BẠN</p>
+      <h1>Đoán đúng — <span>Nhận điểm</span></h1>
+      <p class="subtitle">Mỗi phiên tự lắc sau 30 giây • Vốn ban đầu 100.000 điểm ảo • Không có tiền thật.</p>
+    </section>
 
-        /* Landscape Enforcement Overlay */
-        #rotate-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(3, 0, 8, 0.98);
-            z-index: 99999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: #ffd700;
-            padding: 20px;
-        }
+    <div class="main-content">
+      <section class="game-card">
+        <div class="round-row"><span>PHIÊN <b id="round">001</b></span><span id="status" class="status">ĐANG NHẬN CƯỢC</span></div>
+        <div class="timer-wrap"><div class="timer-label"><span>THỜI GIAN CÒN LẠI</span><strong id="countdown">30s</strong></div><div class="timer-track"><div id="timerBar" class="timer-bar"></div></div></div>
+        <div class="dice-area" aria-label="Ba viên xúc xắc">
+          <div class="die" id="die1">⚀</div><div class="die" id="die2">⚁</div><div class="die" id="die3">⚂</div>
+        </div>
+        <div class="result-box">
+          <span>TỔNG ĐIỂM</span><strong id="total">—</strong><b id="resultLabel">Chọn cửa để bắt đầu</b>
+        </div>
 
-        #rotate-overlay svg {
-            width: 70px;
-            height: 70px;
-            margin-bottom: 20px;
-            animation: rotateDevice 2s infinite ease-in-out;
-            fill: #ffd700;
-        }
+        <div class="bet-title"><span>1. Chọn cửa</span><small>Xỉu ≤ 10 • Tài ≥ 11</small></div>
+        <div class="choices">
+          <button class="choice tai" data-choice="tai" aria-pressed="false"><span>▲</span><strong>TÀI</strong><small>11 – 17 điểm</small></button>
+          <button class="choice xiu" data-choice="xiu" aria-pressed="false"><span>▼</span><strong>XỈU</strong><small>4 – 10 điểm</small></button>
+        </div>
 
-        @keyframes rotateDevice {
-            0% { transform: rotate(0deg); }
-            50% { transform: rotate(-90deg); }
-            100% { transform: rotate(0deg); }
-        }
+        <div class="bet-title"><span>2. Đặt điểm</span><small>Trả thưởng 1,98× tổng cược</small></div>
+        <div class="bet-control">
+          <button id="minus" class="stepper" aria-label="Giảm điểm cược">−</button>
+          <input id="bet" type="number" min="10" step="10" value="100" inputmode="numeric" aria-label="Số điểm cược">
+          <button id="plus" class="stepper" aria-label="Tăng điểm cược">+</button>
+        </div>
+        <div class="quick-bets"><button data-bet="50">50</button><button data-bet="100">100</button><button data-bet="250">250</button><button data-bet="500">500</button><button id="maxBet">TỐI ĐA</button></div>
+        <button id="roll" class="roll-button" disabled>CHỌN TÀI HOẶC XỈU</button>
+        <p class="hint" id="hint">Chọn cửa và số điểm cược, sau đó lắc xúc xắc.</p>
+      </section>
 
-        @media screen and (orientation: portrait) {
-            #rotate-overlay {
-                display: flex !important;
-            }
-        }
-
-        /* Full Screen Absolute Container */
-        .sunwin-container {
-            position: absolute;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(circle at center, #1f0a3a 0%, #0a0314 60%, #030008 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-        }
-
-        /* Top Header Bar */
-        .top-bar {
-            width: 100%;
-            height: 55px;
-            padding: 0 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-            background: linear-gradient(180deg, rgba(15, 6, 30, 0.95) 0%, rgba(15, 6, 30, 0) 100%);
-            flex-shrink: 0;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(90deg, rgba(20, 10, 40, 0.9) 0%, rgba(40, 20, 70, 0.7) 100%);
-            padding: 3px 14px 3px 5px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 215, 0, 0.4);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-
-        .avatar-box {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #ffea9f 0%, #b8860b 100%);
-            border: 2px solid #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 900;
-            color: #4a0000;
-            font-size: 15px;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-        }
-
-        .user-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .user-name {
-            font-size: 11px;
-            font-weight: 800;
-            color: #e0d0ff;
-            text-transform: uppercase;
-        }
-
-        .user-balance {
-            font-size: 14px;
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
-            font-family: 'Roboto Mono', monospace;
-        }
-
-        .session-info {
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            padding: 5px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #ff9d00;
-            letter-spacing: 1px;
-        }
-
-        .top-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .icon-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(180deg, #3a1c5c 0%, #1a0b2e 100%);
-            border: 1px solid #ffd700;
-            color: #ffd700;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-
-        /* Arena - Center Board */
-        .arena {
-            flex: 1;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0 20px;
-            position: relative;
-            z-index: 5;
-        }
-
-        .bet-door {
-            width: 20vw;
-            max-width: 210px;
-            height: 20vw;
-            max-height: 210px;
-            border-radius: 50%;
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        }
-
-        .bet-door:hover { transform: scale(1.03); }
-        .bet-door:active { transform: scale(0.97); }
-
-        .door-xiu {
-            background: radial-gradient(circle, #1a2a40 0%, #0a101d 70%, #03050a 100%);
-            border: 4px solid #3a75c4;
-        }
-        .door-xiu.active {
-            border-color: #00f0ff;
-            box-shadow: inset 0 0 40px rgba(0, 240, 255, 0.8), 0 0 40px rgba(0, 240, 255, 0.8);
-            animation: pulseBlue 1s infinite alternate;
-        }
-
-        .door-tai {
-            background: radial-gradient(circle, #4a0d0d 0%, #200404 70%, #0a0101 100%);
-            border: 4px solid #e63946;
-        }
-        .door-tai.active {
-            border-color: #ff003c;
-            box-shadow: inset 0 0 40px rgba(255, 0, 60, 0.8), 0 0 40px rgba(255, 0, 60, 0.8);
-            animation: pulseRed 1s infinite alternate;
-        }
-
-        @keyframes pulseBlue {
-            from { box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.6), 0 0 25px rgba(0, 240, 255, 0.6); }
-            to { box-shadow: inset 0 0 50px rgba(0, 240, 255, 1), 0 0 45px rgba(0, 240, 255, 1); }
-        }
-        @keyframes pulseRed {
-            from { box-shadow: inset 0 0 30px rgba(255, 0, 60, 0.6), 0 0 25px rgba(255, 0, 60, 0.6); }
-            to { box-shadow: inset 0 0 50px rgba(255, 0, 60, 1), 0 0 45px rgba(255, 0, 60, 1); }
-        }
-
-        .door-title {
-            font-size: 4vw;
-            max-font-size: 44px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            line-height: 1;
-        }
-        .door-xiu .door-title { color: #d8ecff; text-shadow: 0 0 15px rgba(58, 117, 196, 0.9); }
-        .door-tai .door-title { color: #ff3344; text-shadow: 0 0 15px rgba(230, 57, 70, 0.9); }
-
-        .door-sub {
-            font-size: 1.2vw;
-            font-weight: 800;
-            color: #ffd700;
-            margin-top: 3px;
-        }
-
-        .door-stats {
-            margin-top: 6px;
-            background: rgba(0,0,0,0.6);
-            padding: 3px 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .bet-user-amount {
-            font-size: 1.2vw;
-            font-weight: 900;
-            color: #00ffcc;
-            font-family: 'Roboto Mono', monospace;
-        }
-        .bet-total-amount {
-            font-size: 0.8vw;
-            color: #aaa;
-            font-weight: 600;
-        }
-
-        /* Center Stage */
-        .center-stage {
-            position: relative;
-            width: 250px;
-            height: 250px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .plate {
-            width: 240px;
-            height: 240px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #8a1414 0%, #400505 60%, #1a0000 100%);
-            border: 10px solid #e6b800;
-            box-shadow: 0 0 0 4px #5c4700, 0 15px 35px rgba(0,0,0,0.9);
-            position: absolute;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .plate-inner {
-            width: 190px;
-            height: 190px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #a81919 0%, #570a0a 70%, #2e0202 100%);
-            border: 2px dashed rgba(255, 215, 0, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .dice-container {
-            display: flex;
-            gap: 8px;
-            z-index: 2;
-        }
-
-        .dice {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(145deg, #ffffff 0%, #e6e6e6 100%);
-            border-radius: 8px;
-            box-shadow: inset 0 -3px 4px rgba(0,0,0,0.3), 0 6px 12px rgba(0,0,0,0.6);
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            padding: 4px;
-        }
-
-        .dot {
-            width: 7px;
-            height: 7px;
-            background-color: #111;
-            border-radius: 50%;
-            justify-self: center;
-            align-self: center;
-        }
-        .dot.red { background-color: #d90429; }
-
-        .bowl {
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, #ffd700 0%, #b8860b 40%, #5c4300 80%, #241a00 100%);
-            border: 5px solid #ffea9f;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.8);
-            position: absolute;
-            z-index: 10;
-            cursor: grab;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            touch-action: none;
-        }
-        .bowl:active { cursor: grabbing; }
-
-        .bowl-dragon-pattern {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            border: 3px double rgba(255, 255, 255, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .bowl-handle {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #fff 0%, #ffd700 60%, #996515 100%);
-            border: 2px solid #fff;
-        }
-
-        .bowl-text {
-            font-size: 10px;
-            font-weight: 800;
-            color: #4a3000;
-            margin-top: 3px;
-            text-transform: uppercase;
-        }
-
-        .shaking {
-            animation: shakeBowl 0.5s infinite ease-in-out;
-        }
-        @keyframes shakeBowl {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            20% { transform: translate(-6px, 5px) rotate(-3deg); }
-            40% { transform: translate(6px, -5px) rotate(3deg); }
-            60% { transform: translate(-4px, -3px) rotate(-2deg); }
-            80% { transform: translate(4px, 3px) rotate(2deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
-        }
-
-        .timer-badge {
-            position: absolute;
-            top: -20px;
-            z-index: 15;
-            background: radial-gradient(circle, #2a0845 0%, #0e001a 100%);
-            border: 3px solid #ffd700;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.8);
-        }
-
-        .timer-number {
-            font-size: 26px;
-            font-weight: 900;
-            color: #ffd700;
-            font-family: 'Roboto Mono', monospace;
-        }
-        .timer-number.warning { color: #ff2233; animation: blink 0.5s infinite alternate; }
-
-        @keyframes blink { from { opacity: 1; } to { opacity: 0.4; } }
-
-        .btn-open-bowl {
-            position: absolute;
-            bottom: -20px;
-            z-index: 15;
-            background: linear-gradient(180deg, #ffea9f 0%, #d4af37 50%, #aa7c11 100%);
-            border: 2px solid #fff;
-            padding: 5px 18px;
-            border-radius: 16px;
-            color: #3d2200;
-            font-weight: 900;
-            font-size: 12px;
-            cursor: pointer;
-            display: none;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.8);
-        }
-
-        /* History Bar */
-        .history-bar {
-            position: absolute;
-            bottom: 105px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(5, 2, 12, 0.9);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 14px;
-            padding: 3px 10px;
-            display: flex;
-            gap: 5px;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .history-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 6px;
-            font-weight: 900;
-        }
-        .history-dot.xiu { background: #2196f3; color: #fff; }
-        .history-dot.tai { background: #f44336; color: #fff; }
-
-        /* Bottom Controls Bar */
-        .bottom-bar {
-            width: 100%;
-            height: 100px;
-            padding: 4px 15px 12px 15px;
-            background: linear-gradient(0deg, rgba(10, 4, 20, 0.98) 0%, rgba(10, 4, 20, 0.7) 80%, transparent 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-            flex-shrink: 0;
-        }
-
-        .chips-row {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .chip {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 11px;
-            font-weight: 900;
-            cursor: pointer;
-            position: relative;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.7);
-            border: 3px dashed rgba(255,255,255,0.7);
-            transition: transform 
+      <section class="history-card">
+        <div class="history-heading"><h2>Lịch sử phiên</h2><button id="reset" class="reset">Đặt lại điểm</button></div>
+        <div id="history" class="history-empty">Chưa có lượt chơi nào.</div>
+      </section>
+    </div>
+    
+    <footer>Mini game giải trí • Điểm chỉ lưu trên trình duyệt này.</footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
